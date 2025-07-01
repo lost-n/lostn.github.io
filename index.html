@@ -16,10 +16,11 @@
     }
 
     .message {
-      font-size: 14px;
+      font-size: 12px;
       line-height: 1.8;
       margin-bottom: 30px;
       white-space: pre-line;
+      padding: 0 20px;
     }
 
     .gif-container img {
@@ -30,10 +31,38 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
+    .buttons {
+      margin-top: 30px;
+    }
+
+    .buttons button {
+      width: 40px;
+      height: 40px;
+      margin: 5px;
+      border-radius: 50%;
+      border: none;
+      background-color: #fff;
+      color: #111;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      transition: background-color 0.2s;
+    }
+
+    .buttons button:hover {
+      background-color: #ffd700;
+    }
+
     @media screen and (max-width: 480px) {
       .message {
         font-size: 10px;
-        padding: 0 10px;
+      }
+
+      .buttons button {
+        width: 32px;
+        height: 32px;
+        font-size: 10px;
       }
     }
   </style>
@@ -45,16 +74,27 @@
     로딩 중...
   </div>
 
+  <!-- 버튼 -->
+  <div class="buttons">
+    <button onclick="showMessage('2025-07-01')">1</button>
+    <button onclick="showMessage('2025-07-02')">2</button>
+    <button onclick="showMessage('2025-07-03')">3</button>
+    <button onclick="showMessage('2025-07-04')">4</button>
+    <button onclick="showMessage('2025-07-05')">5</button>
+  </div>
+
   <!-- GIF 이미지 -->
   <div class="gif-container">
-    <img src="https://i.postimg.cc/5jR67Bct/buddha-keyring.gif" alt="픽셀 움짤">
+    <img src="https://i.postimg.cc/jwMNx28d/buddha.gif" alt="픽셀 움짤">
   </div>
 
   <script>
     const messages = {
-      '2025-07-01': "오늘도\n빛나는 하루 되세요!",
-      '2025-07-02': "천천히,\n하지만 멈추지 말아요.",
-      '2025-07-03': "괜찮아,\n오늘도 충분히 잘하고 있어."
+      '2025-07-01': "희망 없는 세상에선 살 수 있었지만\n너 없는 세상에선 살고 싶지가 않아서.\n죽음은 너 없는 세상이고\n그래서 나는 정말 죽고 싶지 않았어.\n\n《구의 증명》, 최진영",
+      '2025-07-02': "사랑해. 그렇지만\n불타는 자동차에서는 내리기.\n\n《당신은 언제 노래가 되지》, 허연",
+      '2025-07-03': "그래. 시작은 누구 때문이었는지도 모르지만\n결국 자신을 만드는 건 자기 자신이지.\n살면서 받는 상처나 고통 같은 걸\n자기 삶의 훈장으로 만들지,\n누덕누덕 기운 자국으로 만들지는\n자기한테 달린 것 같아.\n\n《유진과 유진》, 이금이",
+      '2025-07-04': "그런데 말이다.\n평범하다는 건 사실\n가장 이루기 어려운 가치란다.\n\n《아몬드》, 손원평",
+      '2025-07-05': "사랑이 늦게 도착하는 오후엔\n조금 빨리 일어나서 사랑을 기다리도록 한다\n언젠가 삶이 내게 사랑하는 것을 멈추라고 했는데\n나는 조금 멀리 나아가기로 했다\n\n《사랑의 정의는 고양이》, 임현우"
     };
 
     function getTodayString() {
@@ -65,14 +105,18 @@
       return `${yyyy}-${mm}-${dd}`;
     }
 
-    const today = getTodayString();
-    const messageBox = document.getElementById("daily-message");
-
-    if (messages[today]) {
-      messageBox.textContent = messages[today];
-    } else {
-      messageBox.textContent = "오늘의 메시지가 아직 준비되지 않았어요.";
+    function showMessage(dateKey) {
+      const messageBox = document.getElementById("daily-message");
+      if (messages[dateKey]) {
+        messageBox.textContent = messages[dateKey];
+      } else {
+        messageBox.textContent = "해당 날짜의 메시지가 준비되지 않았어요.";
+      }
     }
+
+    // 페이지 열릴 때 오늘 날짜 메시지 자동 표시
+    const today = getTodayString();
+    showMessage(today);
   </script>
 
 </body>
