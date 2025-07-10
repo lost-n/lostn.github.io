@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>읽는도시 읽는당신</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: url('https://postimg.cc/crHwVNJN') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+    }
+
+    /* 흐림 효과용 오버레이 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: -1;
+    }
+
+    .title {
+      font-size: 3rem;
+      font-weight: bold;
+      text-align: center;
+      color: #fff;
+      padding: 30px 20px 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    }
+
+    .corner-icons {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .corner-icons img {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+    }
+
+    /* 슬라이드 컨테이너 */
+    .slider-container {
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      padding: 30px 20px;
+      margin: 0 auto;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+    }
+
+    .slider-container::-webkit-scrollbar {
+      display: none; /* 스크롤바 숨김 */
+    }
+
+    .slider-container img {
+      width: 200px;
+      height: auto;
+      margin-right: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      display: inline-block;
+      transition: transform 0.3s;
+    }
+
+    .slider-container img:hover {
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: 2rem;
+      }
+
+      .corner-icons img {
+        width: 30px;
+        height: 30px;
+      }
+
+      .slider-container img {
+        width: 160px;
+        margin-right: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .slider-container img {
+        width: 80%;
+        margin-right: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="corner-icons">
+    <img src="https://postimg.cc/p5yr1RJG" alt="코너 아이콘1">
+    <img src="https://postimg.cc/c6JvJBGR" alt="코너 아이콘2">
+  </div>
+
+  <div class="title">읽는도시 읽는당신</div>
+
+  <div class="slider-container">
+    <img src="https://postimg.cc/t106ZZNX" alt="카드 1">
+    <img src="https://postimg.cc/S2dYvZFs" alt="카드 2">
+    <img src="https://postimg.cc/tngnQhpz" alt="카드 3">
+    <img src="https://postimg.cc/8j9J9J3h" alt="카드 4">
+  </div>
+</body>
+</html>
