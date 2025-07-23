@@ -9,6 +9,11 @@
       src: url('images/BoldDunggeunmo.woff') format('woff');
     }
 
+    @font-face {
+      font-family: 'BookkMyungjoBold';
+      src: url('images/BookkMyungjo_Bold.woff') format('woff');
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -28,7 +33,7 @@
       position: absolute;
       top: 62%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(2); /* 정중앙 + 확대 + 아래로 내림 */
+      transform: translate(-50%, -50%) scale(2); /* 절반 크기로 축소 */
       cursor: pointer;
       display: block;
     }
@@ -38,7 +43,7 @@
       bottom: 60px;
       width: 100%;
       text-align: center;
-      font-size: 40px; /* 3배 확대 */
+      font-size: 60px; /* 3배 확대 */
       color: black;
       -webkit-text-stroke: 2px white;
       z-index: 5;
@@ -58,6 +63,12 @@
       z-index: 1000;
       text-align: center;
       width: 400px;
+    }
+
+    .name-box p {
+      font-family: 'BookkMyungjoBold', serif;
+      font-size: 20px;
+      margin: 10px 0;
     }
 
     .close-btn {
