@@ -6,16 +6,26 @@
   <style>
     @font-face {
       font-family: 'BoldDunggeunmo';
-      src: url('BoldDunggeunmo.woff') format('woff');
+      src: url('images/BoldDunggeunmo.woff') format('woff');
     }
 
     body {
-      font-family: 'BoldDunggeunmo', sans-serif;
-      background: url('jackmyungback.png') no-repeat center center fixed;
-      background-size: cover;
       margin: 0;
       padding: 0;
-      text-align: center;
+      font-family: 'BoldDunggeunmo', sans-serif;
+      background: url('images/jackmyungback.png') no-repeat center center fixed;
+      background-size: cover;
+      overflow: hidden;
+    }
+
+    #doryung {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 150px;
+      cursor: pointer;
+      z-index: 10;
     }
 
     .name-box {
@@ -30,25 +40,24 @@
       box-shadow: 4px 4px 20px rgba(0,0,0,0.2);
       display: none;
       z-index: 1000;
-    }
-
-    #doryung {
-      margin-top: 80px;
-      width: 150px;
-      cursor: pointer;
+      text-align: center;
     }
 
     .guide-text {
-      margin-top: 20px;
+      position: fixed;
+      bottom: 40px;
+      width: 100%;
+      text-align: center;
       font-size: 20px;
       color: black;
       -webkit-text-stroke: 1px white;
+      z-index: 5;
     }
   </style>
 </head>
 <body>
 
-  <img id="doryung" src="doryung.png" alt="작명 버튼" onclick="showName()">
+  <img id="doryung" src="images/doryung.png" alt="작명 버튼" onclick="showName()">
 
   <div class="guide-text">귀여운 작명가를 눌러보세요</div>
 
@@ -72,7 +81,6 @@
       document.getElementById("name").textContent = `이름: ${random.name}`;
       document.getElementById("meaning").textContent = `뜻: ${random.meaning}`;
       document.getElementById("persona").textContent = `당신은 ${random.persona}입니다.`;
-
       document.getElementById("nameBox").style.display = "block";
     }
   </script>
