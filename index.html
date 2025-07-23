@@ -18,14 +18,30 @@
       overflow: hidden;
     }
 
+    .button-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+    }
+
     #doryung {
       position: absolute;
-      top: 50%;
+      top: 62%;
       left: 50%;
-      transform: translate(-50%, -50%);
-      width: 150px;
+      transform: translate(-50%, -50%) scale(2); /* 정중앙 + 확대 + 아래로 내림 */
       cursor: pointer;
-      z-index: 10;
+      display: block;
+    }
+
+    .guide-text {
+      position: fixed;
+      bottom: 60px;
+      width: 100%;
+      text-align: center;
+      font-size: 40px; /* 3배 확대 */
+      color: black;
+      -webkit-text-stroke: 2px white;
+      z-index: 5;
     }
 
     .name-box {
@@ -34,54 +50,121 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background-color: #fff;
-      padding: 20px 30px;
+      padding: 30px 40px;
       border: 3px solid #8e6e53;
-      border-radius: 12px;
+      border-radius: 16px;
       box-shadow: 4px 4px 20px rgba(0,0,0,0.2);
       display: none;
       z-index: 1000;
       text-align: center;
+      width: 400px;
     }
 
-    .guide-text {
-      position: fixed;
-      bottom: 40px;
-      width: 100%;
-      text-align: center;
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
       font-size: 20px;
-      color: black;
-      -webkit-text-stroke: 1px white;
-      z-index: 5;
+      cursor: pointer;
+    }
+
+    .action-btn {
+      font-family: 'BoldDunggeunmo', sans-serif;
+      margin: 10px 5px 0;
+      padding: 10px 16px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #8e6e53;
+      color: white;
+    }
+
+    .action-btn:hover {
+      background-color: #6d543f;
+    }
+
+    .copied-alert {
+      font-size: 16px;
+      color: green;
+      margin-top: 5px;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <img id="doryung" src="images/doryung.png" alt="작명 버튼" onclick="showName()">
+  <div class="button-container">
+    <img id="doryung" src="images/doryung.png" alt="작명 버튼" onclick="showName()">
+  </div>
 
   <div class="guide-text">귀여운 작명가를 눌러보세요</div>
 
   <div class="name-box" id="nameBox">
+    <div class="close-btn" onclick="closeBox()">❌</div>
     <p id="name"></p>
     <p id="meaning"></p>
     <p id="persona"></p>
+    <button class="action-btn" onclick="copyName()">📋 이름 복사하기</button>
+    <button class="action-btn" onclick="generateName()">🔁 다른 이름 더 보기</button>
+    <p class="copied-alert" id="copiedAlert">복사 완료!</p>
   </div>
 
   <script>
     const names = [
-      {name: "도현(道賢)", meaning: "길 위에서 지혜를 좇는 자", persona: "조선 후기의 여행객"},
-      {name: "예린(藝麟)", meaning: "예술을 품은 상서로운 존재", persona: "고려 시대 궁중 화원"},
-      {name: "하율(河律)", meaning: "물처럼 흐르되 법을 따르는 자", persona: "조선시대 지방관"},
-      {name: "서우(書雨)", meaning: "비처럼 글을 퍼붓는 이", persona: "한학자이자 서예가"},
-      {name: "윤재(潤宰)", meaning: "세상을 윤택하게 다스리는 이", persona: "개화기 실학자"}
+      {name: "소윤(昭潤)", meaning: "밝게 세상을 적시는 자", persona: "조선의 여성 문인"},
+      {name: "건희(健熙)", meaning: "건강하고 찬란한 존재", persona: "고려 말 무관"},
+      {name: "윤하(潤河)", meaning: "강물처럼 세상을 이롭게 하는 이", persona: "고구려 외교관"},
+      {name: "하겸(夏謙)", meaning: "여름처럼 넉넉하고 겸손한 자", persona: "조선 시대 스승"},
+      {name: "채원(采苑)", meaning: "꽃밭에서 빛을 따는 이", persona: "조선 궁중 화원"},
+      {name: "지안(知安)", meaning: "평안을 아는 이", persona: "조선 후기 성리학자"},
+      {name: "은율(恩律)", meaning: "은혜로운 법도를 따르는 자", persona: "백제의 선비"},
+      {name: "연우(蓮雨)", meaning: "연꽃 위에 내리는 비처럼 맑은 이", persona: "조선 여류 시인"},
+      {name: "무진(武進)", meaning: "무예로 전진하는 자", persona: "임진왜란 장수"},
+      {name: "서결(抒潔)", meaning: "맑고 깨끗함을 표현하는 이", persona: "신라 궁중 음악가"},
+      {name: "민서(敏緖)", meaning: "민첩하고 조화로운 자", persona: "고려의 서예가"},
+      {name: "태린(太潾)", meaning: "넓고 맑은 자", persona: "조선 수문장"},
+      {name: "율빈(律彬)", meaning: "예의와 법도를 갖춘 자", persona: "조선 예문관 관리"},
+      {name: "다온(多溫)", meaning: "따뜻함이 많은 자", persona: "한옥 주모"},
+      {name: "세하(世夏)", meaning: "세상을 따뜻하게 비추는 여름 같은 자", persona: "개화기 교사"},
+      {name: "예담(藝談)", meaning: "예술을 이야기하는 자", persona: "조선 기생화가"},
+      {name: "정휘(正輝)", meaning: "바르게 빛나는 자", persona: "고려 관리"},
+      {name: "하온(河溫)", meaning: "따뜻한 강물 같은 존재", persona: "풍류를 즐긴 양반"},
+      {name: "나겸(懦謙)", meaning: "부드럽고 겸손한 이", persona: "조선 선비"},
+      {name: "시안(詩安)", meaning: "시로 평안을 전하는 자", persona: "개화기 시인"},
+      {name: "명주(明珠)", meaning: "밝게 빛나는 보석 같은 자", persona: "신라 귀족 여성"},
+      {name: "우진(雨珍)", meaning: "귀한 비처럼 반가운 자", persona: "농경사회 지도자"},
+      {name: "소율(素律)", meaning: "맑고 절제된 음률을 지닌 이", persona: "궁중 음악가"},
+      {name: "해온(海溫)", meaning: "바다처럼 깊고 따뜻한 자", persona: "제주 해녀의 후손"},
+      {name: "라현(羅賢)", meaning: "지혜를 엮는 자", persona: "조선의 책방 주인"}
     ];
 
     function showName() {
+      generateName();
+      document.getElementById("nameBox").style.display = "block";
+    }
+
+    function generateName() {
       const random = names[Math.floor(Math.random() * names.length)];
       document.getElementById("name").textContent = `이름: ${random.name}`;
       document.getElementById("meaning").textContent = `뜻: ${random.meaning}`;
       document.getElementById("persona").textContent = `당신은 ${random.persona}입니다.`;
-      document.getElementById("nameBox").style.display = "block";
+      document.getElementById("copiedAlert").style.display = "none";
+    }
+
+    function closeBox() {
+      document.getElementById("nameBox").style.display = "none";
+    }
+
+    function copyName() {
+      const text = document.getElementById("name").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const alert = document.getElementById("copiedAlert");
+        alert.style.display = "block";
+        setTimeout(() => {
+          alert.style.display = "none";
+        }, 1500);
+      });
     }
   </script>
 </body>
