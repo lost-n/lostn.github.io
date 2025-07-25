@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>나만의 꿀팁, 카꾸 하기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+  <style>
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: #fffbe9;
+      color: #333;
+      padding: 1rem;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+    }
+    #card-preview {
+      position: relative;
+      width: 100%;
+      min-height: 200px;
+      background: #fff;
+      border-radius: 1rem;
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      overflow: hidden;
+    }
+    .sticker {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      cursor: move;
+      touch-action: none;
+    }
+    #sticker-panel {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    #sticker-panel img {
+      width: 50px;
+      height: 50px;
+      cursor: grab;
+      border-radius: 0.5rem;
+      background: #fff;
+      padding: 0.2rem;
+    }
+    button {
+      margin: 0.5rem 0.25rem;
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 1rem;
+      background: #4b382a;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌟 나만의 꿀팁, 카꾸 하기</h1>
+
+  <div id="card-preview" class="theme-default">
+    <div id="tip-text">“세숫대야 족욕 – 오늘도 발 고생했잖아.”</div>
+  </div>
+
+  <div id="sticker-panel">
+    <img src="https://openmoji.org/data/color/svg/1F341.svg" alt="단풍잎" onclick="addSticker(this.src)">
+    <img src="https://openmoji.org/data/color/svg/1F338.svg" alt="벚꽃" onclick="addSticker(this.src)">
+    <img src="https://openmoji.org/data/color/svg/1F4DC.svg" alt="두루마리" onclick="addSticker(this.src)">
+    <img src="https://openmoji.org/data/color/svg/1F4A1.svg" alt="전구" onclick="addSticker(this.src)">
+    <img src="https://openmoji.org/data/color/svg/2615.svg" alt="찻잔" onclick="addSticker(this.src)">
+    <img src="https://openmoji.org/data/color/svg/1F984.svg" alt="유니콘" onclick="addSticker(this.src)">
+    <img src="https://openmoji.org/data/color/svg/1F339.svg" alt="장미" onclick="addSticker(this.src)">
+    <img src="https://openmoji.org/data/color/svg/1F3B6.svg" alt="음표" onclick="addSticker(this.src)">
+    <img src="https://openmoji.org/data/color/svg/1F3F0.svg" alt="성곽" onclick="addSticker(this.src)">
+    <img src="https://openmoji.org/data/color/svg/1F431.svg" alt="고양이" onclick="addSticker(this.src)">
+  </div>
+
+  <div style="text-align: center;">
+    <button onclick="downloadCard()">이미지 저장</button>
+    <button onclick="window.open('https://www.instagram.com/', '_blank')">인스타그램</button>
+    <button onclick="resetStickers()">초기화</button>
+  </div>
+
+  <script>
+    function addSticker(src) {
+      const sticker = document.createElement("img");
+      sticker.src = src;
+      sticker.className = "sticker";
+      sticker.style.left = "20px";
+      sticker.style.top = "20px";
+      document.getElementById("card-preview").appendChild(sticker);
+      makeInteractive(sticker);
+    }
+
+    function makeInteractive(target) {
+      interact(target).draggable({
+        onmove: event => {
+          const target = event.target;
+          const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+          const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+          target.style.transform = `translate(${x}px, ${y}px) rotate(${target.dataset.rotate || 0}deg) scale(${target.dataset.scale || 1})`;
+          target.setAttribute('data-x', x);
+          target.setAttribute('data-y', y);
+        }
+      }).gesturable({
+        onmove: event => {
+          const target = event.target;
+          const currentScale = parseFloat(target.dataset.scale || 1);
+          const currentAngle = parseFloat(target.dataset.rotate || 0);
+          const newScale = currentScale * (1 + event.ds);
+          const newAngle = currentAngle + event.da;
+          target.dataset.scale = newScale;
+          target.dataset.rotate = newAngle;
+          const x = parseFloat(target.getAttribute('data-x')) || 0;
+          const y = parseFloat(target.getAttribute('data-y')) || 0;
+          target.style.transform = `translate(${x}px, ${y}px) rotate(${newAngle}deg) scale(${newScale})`;
+        }
+      });
+    }
+
+    function resetStickers() {
+      const stickers = document.querySelectorAll('.sticker');
+      stickers.forEach(el => el.remove());
+    }
+
+    function downloadCard() {
+      html2canvas(document.getElementById("card-preview"), {
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: null
+      }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "joseon_kakku.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>
