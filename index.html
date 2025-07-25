@@ -5,7 +5,18 @@
   <title>조선 인생 매뉴얼</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Pretendard&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
+    @font-face {
+      font-family: 'BookkMyungjo';
+      src: url('images/BookkMyungjo_Bold.woff') format('woff');
+      font-weight: bold;
+    }
+    @font-face {
+      font-family: 'BoldDunggeunmo';
+      src: url('images/BoldDunggeunmo.woff') format('woff');
+      font-weight: bold;
+    }
     body {
       font-family: 'Pretendard', sans-serif;
       background: url('images/mapback.png') no-repeat center center fixed;
@@ -15,6 +26,7 @@
       padding: 1.5rem;
     }
     h1 {
+      font-family: 'BookkMyungjo', serif;
       font-size: 1.6rem;
       text-align: center;
       margin-bottom: 1.2rem;
@@ -23,6 +35,7 @@
       border-radius: 1rem;
     }
     #tip-box {
+      font-family: 'BookkMyungjo', serif;
       border-radius: 1rem;
       padding: 1.5rem;
       background: rgba(255,255,255,0.9);
@@ -42,6 +55,36 @@
       cursor: pointer;
       text-align: center;
     }
+    #share-popup {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      z-index: 9999;
+      text-align: center;
+    }
+    #share-popup button {
+      margin: 0.5rem;
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 1rem;
+      background: #4b382a;
+      color: white;
+      cursor: pointer;
+    }
+    #card-preview {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 1rem;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
     footer {
       margin-top: 3rem;
       padding-top: 1.5rem;
@@ -51,6 +94,7 @@
       gap: 1rem;
     }
     footer button {
+      font-family: 'BoldDunggeunmo', sans-serif;
       padding: 1rem;
       font-size: 1rem;
       border: none;
@@ -66,9 +110,16 @@
 
   <div id="tip-box"></div>
 
-  <a href="share.html">
-    <button id="share-button">📢 오늘의 조선 꿀팁 공유</button>
-  </a>
+  <button id="share-button">📢 오늘의 조선 꿀팁 공유</button>
+
+  <!-- 공유 팝업 -->
+  <div id="share-popup">
+    <div id="card-preview">“…”</div>
+    <button onclick="downloadCard()">이미지 저장</button>
+    <button onclick="window.open('https://www.instagram.com/', '_blank')">인스타그램</button>
+    <br><br>
+    <button onclick="document.getElementById('share-popup').style.display='none'">닫기</button>
+  </div>
 
   <footer>
     <button onclick="showFortune()">🔮 조선식 점술 보기</button>
@@ -112,6 +163,21 @@
     const todayChallenge = challenges[todayIndex];
 
     document.getElementById("tip-box").textContent = todayTip;
+
+    document.getElementById("share-button").onclick = () => {
+      const preview = document.getElementById("card-preview");
+      preview.textContent = `“${todayTip}”`;
+      document.getElementById("share-popup").style.display = "block";
+    };
+
+    function downloadCard() {
+      html2canvas(document.getElementById("card-preview")).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "joseon_tip.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
 
     function showFortune() {
       alert(todayFortune);
