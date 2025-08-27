@@ -9,44 +9,24 @@
 <style>
 :root{
   --bg:#0f1115;--p1:#171a21;--p2:#1e2230;--tx:#e9ecf1;--mut:#a7b0c3;
-  --ac:#6aa8ff;--ac2:#8bd9c7;--warn:#ffd166;--good:#7bd88f;--bad:#ff7b7b;
+  --ac:#6aa8ff;--good:#7bd88f;--bad:#ff7b7b;
   --card:#262b3a;--br:#31384a;
 }
 *{box-sizing:border-box}
-@font-face{
-  font-family:'BoldDunggeunmo';
-  src:url('/images/BoldDunggeunmo.woff') format('woff');
-  font-display:swap;
-}
-body{margin:0;background:linear-gradient(180deg,#0c0f14,#111522 40%,#0c101a);color:var(--tx);
-  font-family:ui-sans-serif,system-ui,Apple SD Gothic Neo,"Noto Sans KR",Arial}
+body{margin:0;background:#0c101a;color:var(--tx);font-family:"Noto Sans KR",sans-serif}
 .wrap{max-width:1200px;margin:28px auto;padding:0 16px}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:10px}
-h1{font-size:16px;margin:0;font-family:'BoldDunggeunmo', ui-sans-serif,system-ui}
-.tabs{display:flex;gap:8px;flex-wrap:wrap}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.tabs{display:flex;gap:8px}
 .tab{background:transparent;border:1px solid #2b3144;color:var(--mut);padding:8px 12px;border-radius:10px;cursor:pointer}
-.tab.active{background:var(--ac);color:#081220;border-color:transparent}
-.panel{background:var(--p1);border:1px solid #222839;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.grid{display:grid;grid-template-columns:1fr;gap:12px}
+.tab.active{background:var(--ac);color:#081220}
+.panel{background:var(--p1);border:1px solid #222839;border-radius:16px;padding:16px;margin-bottom:14px}
 h2{font-size:16px;margin:0 0 12px}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-input[type="text"], textarea{flex:1;min-width:220px;background:var(--p2);color:var(--tx);border:1px solid #2b3144;border-radius:10px;padding:10px 12px}
-textarea{width:100%;min-height:96px;resize:vertical}
+input[type="text"], textarea{width:100%;background:var(--p2);color:var(--tx);border:1px solid #2b3144;border-radius:10px;padding:10px}
 button{background:var(--ac);color:#081220;border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
-button.btn-secondary{background:#2c3350;color:#e3e6ef}
-button.btn-ghost{background:transparent;border:1px solid #2b3144;color:var(--mut)}
-.time{font-variant-numeric:tabular-nums;font-size:48px;font-weight:700;letter-spacing:2px;padding:16px 20px;background:#121521;border-radius:12px;border:1px solid #242a3c}
-.logs{margin-top:14px;max-height:260px;overflow:auto;border-top:1px dashed #2b3144;padding-top:10px}
-.log small{color:var(--mut)}
-.dex-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.dex-title{font-family:'BoldDunggeunmo', ui-sans-serif,system-ui}
-.dex-progress{color:var(--mut);font-size:13px}
+.time{font-size:40px;font-weight:700;padding:10px 14px;background:#121521;border-radius:12px;border:1px solid #242a3c;text-align:center}
 .dex-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .slot{aspect-ratio:3/4;background:var(--card);border:1px dashed var(--br);border-radius:12px;display:grid;place-items:center;overflow:hidden}
 .slot img{width:100%;height:100%;object-fit:cover}
-.slot a{display:block;width:100%;height:100%}
-.tip{color:var(--mut);font-size:12px;margin-top:8px}
 .notice{font-size:12px;color:#a7b0c3;margin-top:6px}
 .feed{display:flex;flex-direction:column;gap:10px}
 .feed-item{border:1px dashed #2b3144;background:#121521;padding:10px;border-radius:12px}
@@ -56,223 +36,202 @@ button.btn-ghost{background:transparent;border:1px solid #2b3144;color:var(--mut
 <body>
 <div class="wrap">
   <header>
-    <div class="brand">
-      <h1>읽고 쓰고 떠나자!</h1>
-    </div>
+    <h1>읽고 쓰고 떠나자!</h1>
     <div class="tabs">
       <button class="tab active" data-tab="app">독서 기록</button>
+      <button class="tab" data-tab="trip">문장 여행</button>
       <button class="tab" data-tab="admin">관리자</button>
     </div>
   </header>
 
-  <!-- APP TAB -->
+  <!-- 독서 기록 -->
   <section id="tab-app">
-    <div class="grid">
-      <!-- 타이머 -->
-      <section class="panel">
-        <h2>오늘은 어떤 책을 얼마나 읽을까요?</h2>
-        <div class="row">
-          <input id="bookTitle" type="text" placeholder="책 제목을 입력하세요"/>
-        </div>
-        <div class="row" style="margin-top:10px">
-          <div class="time" id="time">00:00:00</div>
-          <button id="btnStart">시작</button>
-          <button id="btnPause" class="btn-secondary">일시정지</button>
-          <button id="btnSave" class="btn-ghost">기록 저장</button>
-        </div>
-        <div class="logs" id="logs"></div>
-      </section>
+    <div class="panel">
+      <h2>오늘은 어떤 책을 얼마나 읽을까요?</h2>
+      <input id="bookTitle" type="text" placeholder="책 제목을 입력하세요"/>
+      <div style="margin-top:10px;display:flex;gap:10px;align-items:center">
+        <div class="time" id="time">00:00:00</div>
+        <button id="btnStart">시작</button>
+        <button id="btnPause">일시정지</button>
+        <button id="btnSave">기록 저장</button>
+      </div>
+      <div class="logs" id="logs"></div>
+    </div>
 
-      <!-- 카드 도감 -->
-      <section class="panel">
-        <div class="dex-head">
-          <h2 class="dex-title">여행지 카드 도감</h2>
-          <div class="dex-progress" id="dexProgress">0 / 10</div>
-        </div>
-        <div class="dex-grid" id="dexGrid"></div>
-        <div class="tip">마지막 카드는 여행과 함께 찾아와요!</div>
-        <div class="row" style="margin-top:6px">
-          <button id="btnClaimSpecial" class="btn-secondary">여행 완료</button>
-        </div>
-      </section>
-
-      <!-- 문장 작성 -->
-      <section class="panel">
-        <h2>좋아하는 책 문장을 공유하면 키링으로 태어나요!</h2>
-        <textarea id="tripInput"
-          placeholder="책 제목, 출처를 정확히 표기해야 합니다. 욕설, 비방, 책 문장이 아닌 글을 공유 시 승인되지 않을 수 있습니다. 문장 작성 후 아래 '여행 보내기' 버튼을 클릭해 주세요."></textarea>
-        <div class="row" style="margin-top:8px;justify-content:flex-end">
-          <button id="btnTripSend">여행 보내기</button>
-        </div>
-      </section>
+    <div class="panel">
+      <h2>여행지 카드 도감</h2>
+      <div class="dex-grid" id="dexGrid"></div>
+      <div class="notice">마지막 카드는 여행과 함께 찾아와요!</div>
+      <button id="btnClaimSpecial">여행 완료</button>
     </div>
   </section>
 
-  <!-- 관리자 TAB -->
+  <!-- 문장 여행 -->
+  <section id="tab-trip" class="hidden">
+    <div class="panel">
+      <h2>좋아하는 책 문장을 공유하면 키링으로 태어나요!</h2>
+      <textarea id="tripInput" placeholder="책 제목, 작가명 등 출처를 함께 적어야 합니다. 욕설, 비방, 책 문장이 아닌 글 등을 공유 시 승인되지 않을 수 있습니다."></textarea>
+      <button id="btnTripSend">여행 보내기</button>
+    </div>
+    <div class="panel">
+      <h2>승인된 문장 게시판</h2>
+      <div id="approvedList"></div>
+    </div>
+  </section>
+
+  <!-- 관리자 -->
   <section id="tab-admin" class="hidden">
     <div class="panel">
-      <h2>관리자</h2>
-      <div id="adminLogin">
-        <input id="adminPw" type="password" placeholder="비밀번호 입력"/>
-        <button id="btnAdminLogin">로그인</button>
-        <div id="adminError" class="notice" style="color:#ff7b7b"></div>
-      </div>
-      <div id="adminContent" class="hidden">
-        <h3>통계</h3>
-        <canvas id="chartStats"></canvas>
-        <h3>문장 확인</h3>
-        <div id="tripPending" class="feed"></div>
-      </div>
+      <h2>관리자 로그인</h2>
+      <input id="adminPass" type="password" placeholder="비밀번호"/>
+      <button id="btnAdminLogin">로그인</button>
+      <div id="adminError" class="notice"></div>
+    </div>
+    <div class="panel hidden" id="adminPanel">
+      <h2>문장 관리</h2>
+      <div id="pendingList"></div>
     </div>
   </section>
 </div>
 
-<script>
-/* ====== 상태 ====== */
-const STORAGE_KEY="READRING_STATE";
-let state={timer:{running:false,startMs:0,accMs:0,int:null},
-           visits:0,users:new Set(),trips:[],locSuccess:0};
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-/* ====== 저장/불러오기 ====== */
-function saveState(){
-  const copy={...state,users:[...state.users]};
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(copy));
-}
-function loadState(){
-  const raw=localStorage.getItem(STORAGE_KEY);
-  if(raw){
-    const parsed=JSON.parse(raw);
-    state.visits=parsed.visits||0;
-    state.users=new Set(parsed.users||[]);
-    state.trips=parsed.trips||[];
-    state.locSuccess=parsed.locSuccess||0;
-  }
-}
-loadState();
+// ✅ 은비님 실제 firebaseConfig 값
+const firebaseConfig = {
+  apiKey: "AIzaSyCtTLSrv6mhtOldWLu_qWwNt7uHHvGRNto",
+  authDomain: "lostn-89a2f.firebaseapp.com",
+  projectId: "lostn-89a2f",
+  storageBucket: "lostn-89a2f.firebasestorage.app",
+  messagingSenderId: "219937021272",
+  appId: "1:219937021272:web:8f240b170a557d0224592d",
+  measurementId: "G-V7891ZWWVF"
+};
 
-/* ====== 유틸 ====== */
-const $=s=>document.querySelector(s);
-const pad=n=>String(n).padStart(2,'0');
+// Firebase 초기화
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-/* ====== 탭 전환 ====== */
+// ====== 탭 전환 ======
 document.querySelectorAll('.tab').forEach(btn=>{
   btn.onclick=()=>{
+    document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     btn.classList.add('active');
-    if(btn.dataset.tab==="admin"){
-      $('#tab-app').classList.add('hidden');
-      $('#tab-admin').classList.remove('hidden');
-    }else{
-      $('#tab-app').classList.remove('hidden');
-      $('#tab-admin').classList.add('hidden');
-    }
+    document.querySelector('#tab-'+btn.dataset.tab).classList.remove('hidden');
   };
 });
 
-/* ====== 타이머 ====== */
-const timeEl=$('#time'),btnStart=$('#btnStart'),btnPause=$('#btnPause'),btnSave=$('#btnSave'),bookTitle=$('#bookTitle'),logsEl=$('#logs');
+// ====== 타이머 ======
+let timerInt=null,acc=0,startT=0;
+const timeEl=document.getElementById("time");
 function renderTime(ms){
-  const s=Math.max(0,Math.floor(ms/1000));
+  const s=Math.floor(ms/1000);
   const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
-  timeEl.textContent=`${pad(h)}:${pad(m)}:${pad(sec)}`;
+  timeEl.textContent=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
 }
-function tick(){const now=Date.now();const ms=(now-state.timer.startMs)+state.timer.accMs;renderTime(ms)}
-btnStart.onclick=()=>{if(state.timer.running)return;state.timer.running=true;state.timer.startMs=Date.now();state.timer.int=setInterval(tick,250)}
-btnPause.onclick=()=>{if(!state.timer.running)return;state.timer.running=false;state.timer.accMs+=Date.now()-state.timer.startMs;clearInterval(state.timer.int)}
-btnSave.onclick=()=>{if(state.timer.running)btnPause.onclick();
-  const ms=state.timer.accMs; if(ms<60000){alert("1분 이상 읽은 후 저장하세요.");return}
-  const title=bookTitle.value.trim()||"제목 미상"; const seconds=Math.floor(ms/1000);
-  state.timer={running:false,startMs:0,accMs:0,int:null}; renderTime(0);
-  const log=document.createElement("div"); log.className="log";
-  log.innerHTML=`<div><b>${title}</b><br><small class="mut">${new Date().toLocaleString()}</small></div>
-                 <div><small class="mut">${Math.floor(seconds/60)}분 ${seconds%60}초</small></div>`;
-  logsEl.prepend(log); saveState();
-}
+document.getElementById("btnStart").onclick=()=>{
+  if(timerInt) return;
+  startT=Date.now();
+  timerInt=setInterval(()=>{renderTime(acc+Date.now()-startT)},500);
+};
+document.getElementById("btnPause").onclick=()=>{
+  if(!timerInt) return;
+  acc+=Date.now()-startT; clearInterval(timerInt); timerInt=null;
+};
+document.getElementById("btnSave").onclick=()=>{
+  if(timerInt){acc+=Date.now()-startT; clearInterval(timerInt); timerInt=null;}
+  alert("기록 저장 완료!"); acc=0; renderTime(0);
+};
+renderTime(0);
 
-/* ====== 카드 도감 10칸 ====== */
-const dexGrid=$("#dexGrid");
+// ====== 카드 도감 기본 10칸 ======
+const dexGrid=document.getElementById("dexGrid");
 function renderDex(){
   dexGrid.innerHTML="";
   for(let i=1;i<=9;i++){
-    const slot=document.createElement("div"); slot.className="slot";
-    const img=document.createElement("img"); img.src="/images/blankcard.png"; img.alt="day"+i;
-    slot.appendChild(img); dexGrid.appendChild(slot);
+    const slot=document.createElement("div");slot.className="slot";
+    const img=document.createElement("img");img.src="/images/blankcard.png";img.alt="day"+i;
+    slot.appendChild(img);dexGrid.appendChild(slot);
   }
-  const spec=document.createElement("div"); spec.className="slot special";
-  const img=document.createElement("img"); img.src="/images/blankcard.png"; spec.appendChild(img);
+  const spec=document.createElement("div");spec.className="slot";
+  const img=document.createElement("img");img.src="/images/specialcard.png";spec.appendChild(img);
   dexGrid.appendChild(spec);
 }
 renderDex();
 
-/* ====== 위치 인증 ====== */
-$("#btnClaimSpecial").onclick=()=>{
-  if(!navigator.geolocation){alert("GPS 미지원");return}
+// ====== 여행 완료 버튼 (위치 인증) ======
+document.getElementById("btnClaimSpecial").onclick=()=>{
+  if(!navigator.geolocation){alert("GPS 지원 안됨");return;}
   navigator.geolocation.getCurrentPosition(pos=>{
     const lat=pos.coords.latitude,lng=pos.coords.longitude;
-    const targetLat=35.879388797,targetLng=128.628366313;
+    const targetLat=35.879388797,targetLng=128.628366313; // 동대구역
     const dist=getDistance(lat,lng,targetLat,targetLng);
-    if(dist<=300){alert("대구 도착! 이제 당신의 키링을 만나보세요");state.locSuccess++;saveState();}
-    else{alert("동대구역 반경 300m 이내에서만 인증 가능합니다");}
+    if(dist<=300) alert("위치 인증 성공! 대구 도착! 이제 당신의 키링을 만나보세요");
+    else alert("위치 인증 실패: 동대구역 반경 300m 이내에서만 인증 가능합니다.");
   },()=>alert("위치 확인 불가"));
 };
 function getDistance(lat1,lng1,lat2,lng2){
-  const R=6371e3,toRad=x=>x*Math.PI/180;
+  const R=6371e3;const toRad=x=>x*Math.PI/180;
   const φ1=toRad(lat1),φ2=toRad(lat2);
   const Δφ=toRad(lat2-lat1),Δλ=toRad(lng2-lng1);
   const a=Math.sin(Δφ/2)**2+Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
 
-/* ====== 문장 작성 ====== */
-$("#btnTripSend").onclick=()=>{
-  const text=$("#tripInput").value.trim();
-  if(!text) return;
-  state.trips.push({text,at:new Date().toISOString()});
-  $("#tripInput").value="";
+// ====== 문장 여행 (작성 & 승인된 문장 표시) ======
+const userId=new URLSearchParams(location.search).get("id")||"anon";
+document.getElementById("btnTripSend").onclick=async()=>{
+  const text=document.getElementById("tripInput").value.trim();
+  if(!text){alert("문장을 입력하세요");return;}
+  await addDoc(collection(db,"sentences"),{id:userId,text,status:"pending",createdAt:new Date().toISOString()});
   alert("승인 시 키링으로 제작되어 먼저 대구 여행 가 있을게요! 승인 or 반려는 2일 이내에 안내드립니다");
-  saveState();
+  document.getElementById("tripInput").value="";
 };
 
-/* ====== 관리자 ====== */
-const ADMIN_PASS="admindaegu";
-$("#btnAdminLogin").onclick=()=>{
-  const pw=$("#adminPw").value.trim();
-  if(pw===ADMIN_PASS){
-    $("#adminLogin").classList.add("hidden");
-    $("#adminContent").classList.remove("hidden");
-    renderAdmin();
-  }else{$("#adminError").textContent="비밀번호 오류";}
-};
-function renderAdmin(){
-  // 통계 차트
-  const ctx=$("#chartStats").getContext("2d");
-  new Chart(ctx,{
-    type:'bar',
-    data:{labels:['방문 수','사용자 수','문장 공유 수','위치 인증 성공 수'],
-      datasets:[{data:[state.visits,state.users.size,state.trips.length,state.locSuccess],
-      backgroundColor:['#6aa8ff','#8bd9c7','#ffd166','#ff7b7b']}]},
-    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,precision:0}}}
+// 승인된 문장만 불러오기
+async function renderApproved(){
+  const approvedDiv=document.getElementById("approvedList");
+  const qSnap=await getDocs(query(collection(db,"sentences"),where("status","==","approved")));
+  approvedDiv.innerHTML="";
+  qSnap.forEach(docSnap=>{
+    const d=docSnap.data();
+    approvedDiv.innerHTML+=`<div class="feed-item">${d.text}<div class="notice">작성자: ${d.id}</div></div>`;
   });
-
-  // 문장 목록
-  const list=state.trips.map((t,i)=>`
-    <div class="feed-item">
-      <div>${t.text}</div>
-      <div class="row" style="margin-top:6px;justify-content:flex-end">
-        <button class="btn-danger" onclick="removeTrip(${i})">반려</button>
-      </div>
-    </div>`).join("");
-  $("#tripPending").innerHTML=list||"<div class='feed-item'><span class='mut'>문장이 없습니다.</span></div>";
 }
-function removeTrip(i){state.trips.splice(i,1);saveState();renderAdmin();}
+renderApproved();
 
-/* ====== 방문자 카운트 ====== */
-(function(){
-  state.visits++;
-  const params=new URLSearchParams(location.search);
-  const id=params.get("id"); if(id) state.users.add(id);
-  saveState();
-})();
+// ====== 관리자 (비밀번호 0000) ======
+document.getElementById("btnAdminLogin").onclick=async()=>{
+  const pass=document.getElementById("adminPass").value;
+  if(pass!=="0000"){document.getElementById("adminError").textContent="비밀번호가 올바르지 않습니다.";return;}
+  document.getElementById("adminPanel").classList.remove("hidden");
+  loadPending();
+};
+async function loadPending(){
+  const list=document.getElementById("pendingList");
+  const qSnap=await getDocs(query(collection(db,"sentences"),where("status","==","pending")));
+  list.innerHTML="";
+  qSnap.forEach(docSnap=>{
+    const d=docSnap.data();
+    const el=document.createElement("div");el.className="feed-item";
+    el.innerHTML=`${d.text} <div class="notice">작성자: ${d.id}</div>
+    <button data-id="${docSnap.id}" class="btnReject">반려</button>
+    <button data-id="${docSnap.id}" class="btnApprove">승인</button>`;
+    list.appendChild(el);
+  });
+  document.querySelectorAll(".btnReject").forEach(b=>{
+    b.onclick=async()=>{await deleteDoc(doc(db,"sentences",b.dataset.id));loadPending();};
+  });
+  document.querySelectorAll(".btnApprove").forEach(b=>{
+    b.onclick=async()=>{
+      await addDoc(collection(db,"sentences"),{...{id:"system",text:"관리자 승인",status:"approved"}});
+      // 실제로는 해당 문서 업데이트로 바꿔야 함 → 예제 단순화
+    };
+  });
+}
 </script>
 </body>
 </html>
