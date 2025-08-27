@@ -97,9 +97,11 @@ button{background:var(--ac);color:#081220;border:none;border-radius:10px;padding
 <!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { 
+  getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc, updateDoc 
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-// ✅ 은비님 실제 firebaseConfig 값
+// ✅ 실제 firebaseConfig 값
 const firebaseConfig = {
   apiKey: "AIzaSyCtTLSrv6mhtOldWLu_qWwNt7uHHvGRNto",
   authDomain: "lostn-89a2f.firebaseapp.com",
@@ -153,11 +155,11 @@ function renderDex(){
   dexGrid.innerHTML="";
   for(let i=1;i<=9;i++){
     const slot=document.createElement("div");slot.className="slot";
-    const img=document.createElement("img");img.src="/images/blankcard.png";img.alt="day"+i;
+    const img=document.createElement("img");img.src="/images/day"+i+".jpg";img.alt="day"+i;
     slot.appendChild(img);dexGrid.appendChild(slot);
   }
   const spec=document.createElement("div");spec.className="slot";
-  const img=document.createElement("img");img.src="/images/specialcard.png";spec.appendChild(img);
+  const img=document.createElement("img");img.src="/images/specialcard.jpg";spec.appendChild(img);
   dexGrid.appendChild(spec);
 }
 renderDex();
@@ -186,7 +188,7 @@ const userId=new URLSearchParams(location.search).get("id")||"anon";
 document.getElementById("btnTripSend").onclick=async()=>{
   const text=document.getElementById("tripInput").value.trim();
   if(!text){alert("문장을 입력하세요");return;}
-  await addDoc(collection(db,"sentences"),{id:userId,text,status:"pending",createdAt:new Date().toISOString()});
+  await addDoc(collection(db,"sentences"),{id:userId,text,status:"pending",createdAt:new Date().toISOString(),isNotified:false});
   alert("승인 시 키링으로 제작되어 먼저 대구 여행 가 있을게요! 승인 or 반려는 2일 이내에 안내드립니다");
   document.getElementById("tripInput").value="";
 };
@@ -202,6 +204,20 @@ async function renderApproved(){
   });
 }
 renderApproved();
+
+// 접속 시 내 문장이 승인됐는지 알림 (한 번만)
+async function checkMyApproval(){
+  if(!userId || userId==="anon") return;
+  const qSnap=await getDocs(query(collection(db,"sentences"),where("id","==",userId)));
+  qSnap.forEach(async(docSnap)=>{
+    const d=docSnap.data();
+    if(d.status==="approved" && !d.isNotified){
+      alert(`✅ 승인된 문장: ${d.text}`);
+      await updateDoc(doc(db,"sentences",docSnap.id),{isNotified:true});
+    }
+  });
+}
+checkMyApproval();
 
 // ====== 관리자 (비밀번호 0000) ======
 document.getElementById("btnAdminLogin").onclick=async()=>{
@@ -227,8 +243,9 @@ async function loadPending(){
   });
   document.querySelectorAll(".btnApprove").forEach(b=>{
     b.onclick=async()=>{
-      await addDoc(collection(db,"sentences"),{...{id:"system",text:"관리자 승인",status:"approved"}});
-      // 실제로는 해당 문서 업데이트로 바꿔야 함 → 예제 단순화
+      await updateDoc(doc(db,"sentences",b.dataset.id),{status:"approved"});
+      loadPending();
+      renderApproved();
     };
   });
 }
