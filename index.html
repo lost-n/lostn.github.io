@@ -31,7 +31,7 @@
   .btn.primary{background:var(--primary);color:var(--primary-fore);border-color:var(--primary)}
   .stack{display:flex;flex-direction:column;gap:12px}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  .slot{aspect-ratio:3/4;background:#eef1f6;border:1px dashed #d1d5db;border-radius:14px;display:grid;place-items:center;overflow:hidden}
+  .slot{aspect-ratio:3/4;background:#eef1f6;border:1px dashed #d1d5db;border-radius:14px;display:grid;place-items:center;overflow:hidden;color:#9aa3af;font-weight:800;font-size:36px}
   .slot img{width:100%;height:100%;object-fit:cover}
   .feed{display:flex;flex-direction:column;gap:10px}
   .feed-item{border:1px dashed #d1d5db;background:#fafafa;padding:12px;border-radius:12px}
@@ -82,7 +82,7 @@
     <div class="stack">
       <div class="panel">
         <h2>문장 여행</h2>
-        <textarea id="tripInput" class="textarea"></textarea>
+        <textarea id="tripInput" class="textarea" placeholder="책 제목, 작가명 등 정확한 정보를 함께 입력하세요."></textarea>
         <button id="btnTripSend" class="btn primary" style="margin-top:10px;width:100%">보내기</button>
       </div>
       <div class="panel">
@@ -97,9 +97,9 @@
     <div class="stack">
       <div class="panel">
         <h2>관리자</h2>
-        <input id="adminPass" class="input" type="password" placeholder="비밀번호"/>
+        <input id="adminPass" class="input" type="password" placeholder="비밀번호(예: 0000)"/>
         <button id="btnAdminLogin" class="btn primary" style="margin-top:10px;width:100%">로그인</button>
-        <div id="adminError" class="mut"></div>
+        <div id="adminError" class="mut" style="margin-top:8px"></div>
       </div>
       <div id="adminPanel" class="panel hidden">
         <h2>승인 대기</h2>
@@ -122,13 +122,14 @@
 <!-- 카드 팝업 -->
 <div id="cardPopup" class="popup hidden">
   <div class="popup-inner">
-    <h3>오늘의 카드</h3>
+    <h3 style="margin-top:0">오늘의 카드</h3>
     <img id="popupImg" src="" alt="card"/>
     <button id="popupClose" class="btn primary" style="margin-top:10px;width:100%">확인</button>
   </div>
 </div>
 
 <script>
+/* -------------------- 탭 전환 -------------------- */
 document.querySelectorAll('.tab').forEach(btn=>{
   btn.onclick=()=>{
     document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
@@ -140,13 +141,41 @@ document.querySelectorAll('.tab').forEach(btn=>{
 });
 if(window.lucide) window.lucide.createIcons();
 
-// 타이머
+/* -------------------- LocalStorage -------------------- */
+const LS = {
+  get(key, fallback){ try{const v=localStorage.getItem(key); return v?JSON.parse(v):fallback;}catch{ return fallback; } },
+  set(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+};
+// 기록/카드 상태 영구 저장
+const state = LS.get('read80_state', {
+  logs: [],               // {book, ms, at}
+  givenCount: 0,          // 0~9 (1~8 일반, 9 스페셜 포함)
+  lastClaimDate: null     // "YYYY-MM-DD"
+});
+function persist(){ LS.set('read80_state', state); }
+
+/* -------------------- 타이머 -------------------- */
 let timerInt=null, acc=0, startT=0;
 const timeEl=document.getElementById("time");
 function renderTime(ms){
   const s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
   timeEl.textContent=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
 }
+function pushLogUI(log){
+  const logs=document.getElementById("logs");
+  const item=document.createElement("div");
+  item.className="feed-item";
+  const m=Math.floor(log.ms/60000), sec=Math.floor((log.ms%60000)/1000);
+  item.innerHTML=`<strong>${log.book||"무제"}</strong><div class="mut">${m}분 ${sec}초 • ${new Date(log.at).toLocaleString()}</div>`;
+  logs.prepend(item);
+}
+function hydrateLogsUI(){
+  document.getElementById("logs").innerHTML="";
+  state.logs.forEach(l=>pushLogUI(l));
+}
+hydrateLogsUI();
+renderTime(0);
+
 document.getElementById("btnStart").onclick=()=>{
   if(timerInt) return;
   startT=Date.now();
@@ -157,82 +186,219 @@ document.getElementById("btnPause").onclick=()=>{
   acc+=Date.now()-startT; clearInterval(timerInt); timerInt=null;
 };
 document.getElementById("btnSave").onclick=()=>{
+  // 일시 정지 처리(진행 중이면 누적)
   if(timerInt){ acc+=Date.now()-startT; clearInterval(timerInt); timerInt=null; }
-  if(acc<60000){ alert("1분 이상 읽어야 저장 가능합니다."); acc=0; renderTime(0); return; }
-  // 기록 저장
+  // 1분 미만이면 그대로 유지(초기화 금지) → 버그 수정
+  if(acc<60000){
+    alert("1분 이상 읽어야 저장할 수 있어요.");
+    renderTime(acc); // 유지
+    return;
+  }
+  // 저장
   const book=document.getElementById("bookTitle").value||"무제";
-  const logs=document.getElementById("logs");
-  const item=document.createElement("div");
-  item.className="feed-item";
-  item.innerHTML=`<strong>${book}</strong><div class="mut">${Math.floor(acc/60000)}분</div>`;
-  logs.prepend(item);
-  acc=0; renderTime(0);
+  const log={ book, ms:acc, at:Date.now() };
+  state.logs.unshift(log); persist(); pushLogUI(log);
+
   // 카드 지급
-  giveCard();
+  giveCardAfterSave();
+
+  // 성공적으로 저장했을 때만 초기화
+  acc=0; renderTime(0);
 };
 
-// 카드 도감
+/* -------------------- 카드 도감 -------------------- */
 const dexGrid=document.getElementById("dexGrid");
-let today=new Date().toDateString();
-let givenCount=0;
+
+// 팝업 큐 (day8 후 special 연속 표시)
+const popupQueue=[];
+const popup=document.getElementById("cardPopup");
+const popupImg=document.getElementById("popupImg");
+document.getElementById("popupClose").onclick=()=>{
+  popup.classList.add("hidden");
+  if(popupQueue.length){ const next=popupQueue.shift(); showPopup(next); }
+};
+
+function showPopup(src){
+  popupImg.src=src;
+  popup.classList.remove("hidden");
+}
+
+function ymd(ts){ const d=new Date(ts ?? Date.now()); return `${d.getFullYear()}-${(d.getMonth()+1+'').padStart(2,'0')}-${(d.getDate()+'').padStart(2,'0')}`; }
+
 function renderDex(){
   dexGrid.innerHTML="";
   for(let i=1;i<=9;i++){
     const slot=document.createElement("div"); slot.className="slot";
-    if(i<=givenCount){
+    if(i<=state.givenCount){
       const img=new Image();
-      img.src=i===9?"/images/specialcard.png":`/images/day${i}.jpg`;
+      img.src = (i===9) ? "/images/specialcard.png" : `/images/day${i}.jpg`;
       img.onload=()=>{ slot.innerHTML=""; slot.appendChild(img); };
       img.onerror=()=>{ slot.textContent="?"; };
       slot.appendChild(document.createTextNode(""));
-    }else slot.textContent="?";
+    }else{
+      slot.textContent="?";
+    }
     dexGrid.appendChild(slot);
   }
 }
-function giveCard(){
-  const now=new Date().toDateString();
-  if(today===now){ alert("오늘은 이미 카드를 받았습니다."); return; }
-  today=now;
-  if(givenCount<8){ givenCount++; showPopup(`/images/day${givenCount}.jpg`); }
-  else if(givenCount===8){ givenCount=9; showPopup(`/images/specialcard.png`); }
-  renderDex();
-}
-function showPopup(src){
-  document.getElementById("popupImg").src=src;
-  document.getElementById("cardPopup").classList.remove("hidden");
-}
-document.getElementById("popupClose").onclick=()=>{ document.getElementById("cardPopup").classList.add("hidden"); };
 renderDex();
 
-// 관리자 제어
-let isAdmin=false;
-document.getElementById("btnAdminLogin").onclick=()=>{
-  const pass=document.getElementById("adminPass").value;
-  if(pass!=="0000"){ document.getElementById("adminError").textContent="비밀번호 오류"; return; }
-  isAdmin=true;
-  document.getElementById("adminPanel").classList.remove("hidden");
-  renderApproved();
-};
-async function renderApproved(){
-  const list=document.getElementById("approvedList");
-  list.innerHTML="";
-  // Firestore 연동 대신 샘플 → 실제 Firestore 불러오기 부분은 유지
-  // 여기서는 관리자일 때만 삭제 버튼 표시
-  // ex) d={id,text}
-  const dummy=[{id:"1",text:"예시 문장"}];
-  dummy.forEach(d=>{
-    const item=document.createElement("div");
-    item.className="feed-item";
-    item.textContent=d.text;
-    if(isAdmin){
-      const del=document.createElement("button");
-      del.className="btn"; del.textContent="삭제"; del.style.marginTop="6px";
-      del.onclick=()=>{ item.remove(); /* Firestore delete 추가 */ };
-      item.appendChild(del);
+function giveCardAfterSave(){
+  const today = ymd();
+  // 1일 1회 제한
+  if(state.lastClaimDate === today){
+    alert("오늘 카드는 이미 받았어요.");
+    return;
+  }
+  // 지급 로직
+  if(state.givenCount < 8){
+    const next = state.givenCount + 1; // 1..8
+    state.givenCount = next;
+    state.lastClaimDate = today;
+    persist();
+    renderDex();
+    popupQueue.length = 0; // 초기화
+    popupQueue.push(`/images/day${next}.jpg`);
+    // day8 이후 스페셜 즉시 큐 추가
+    if(next === 8){
+      state.givenCount = 9; // 스페셜 포함된 상태로 업데이트
+      persist();
+      renderDex();
+      popupQueue.push(`/images/specialcard.png`);
     }
-    list.appendChild(item);
-  });
+    const first=popupQueue.shift(); showPopup(first);
+  } else if (state.givenCount === 8) {
+    // 방어 로직(이론상 위 분기에서 처리됨)
+    state.givenCount = 9; state.lastClaimDate = today; persist(); renderDex();
+    showPopup(`/images/specialcard.png`);
+  } else {
+    // 이미 스페셜까지 보유
+    alert("모든 카드를 수집했어요!");
+    state.lastClaimDate = today; persist();
+  }
 }
+
+/* -------------------- Firebase (문장/관리) -------------------- */
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, getDocs, query, where,
+    deleteDoc, doc, updateDoc, orderBy
+  } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCtTLSrv6mhtOldWLu_qWwNt7uHHvGRNto",
+    authDomain: "lostn-89a2f.firebaseapp.com",
+    projectId: "lostn-89a2f",
+    storageBucket: "lostn-89a2f.firebasestorage.app",
+    messagingSenderId: "219937021272",
+    appId: "1:219937021272:web:8f240b170a557d0224592d",
+    measurementId: "G-V7891ZWWVF"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const userId = new URLSearchParams(location.search).get("id") || "anon";
+
+  /* ----- 문장 전송 ----- */
+  const tripBtn = document.getElementById("btnTripSend");
+  if(tripBtn){
+    tripBtn.onclick = async()=>{
+      const textarea = document.getElementById("tripInput");
+      const text = textarea.value.trim();
+      if(!text){ alert("문장을 입력하세요."); return; }
+      await addDoc(collection(db,"sentences"),{
+        id:userId, text, status:"pending", createdAt:new Date().toISOString(), isNotified:false
+      });
+      // 안내 문구(요청 반영)
+      alert("키링으로 제작되어 먼저 대구 여행 가 있을게요! 승인 또는 반려는 2일 이내에 안내드립니다.");
+      textarea.value="";
+      // 갱신
+      renderApproved();
+    };
+  }
+
+  /* ----- 승인된 문장 표시 (실데이터) ----- */
+  async function renderApproved(){
+    const approvedDiv=document.getElementById("approvedList");
+    if(!approvedDiv) return;
+    const qSnap=await getDocs(query(collection(db,"sentences"),
+      where("status","==","approved"), orderBy("createdAt","desc")));
+    approvedDiv.innerHTML="";
+    qSnap.forEach(docSnap=>{
+      const d=docSnap.data();
+      const el=document.createElement("div");
+      el.className="feed-item";
+      el.innerHTML = `${d.text}<div class="mut">작성자: ${d.id}</div>`;
+      // 관리자에게만 삭제 버튼 노출(요청 7)
+      if(window.__isAdmin){
+        const del=document.createElement("button");
+        del.className="btn"; del.textContent="삭제"; del.style.marginTop="6px";
+        del.onclick = async()=>{ await deleteDoc(doc(db,"sentences",docSnap.id)); renderApproved(); };
+        el.appendChild(del);
+      }
+      approvedDiv.appendChild(el);
+    });
+  }
+  renderApproved();
+
+  /* ----- 승인 알림(1회) ----- */
+  async function checkMyApproval(){
+    if(!userId || userId==="anon") return;
+    const qSnap=await getDocs(query(collection(db,"sentences"),where("id","==",userId)));
+    qSnap.forEach(async(docSnap)=>{
+      const d=docSnap.data();
+      if(d.status==="approved" && !d.isNotified){
+        alert(`✅ 승인된 문장: ${d.text}`);
+        await updateDoc(doc(db,"sentences",docSnap.id),{isNotified:true});
+      }
+    });
+  }
+  checkMyApproval();
+
+  /* ----- 관리자 ----- */
+  const adminBtn = document.getElementById("btnAdminLogin");
+  if(adminBtn){
+    adminBtn.onclick = async()=>{
+      const pass = (document.getElementById("adminPass")).value;
+      if(pass!=="0000"){ document.getElementById("adminError").textContent="비밀번호가 올바르지 않습니다."; return; }
+      window.__isAdmin = true; // 전역 플래그(비밀 공간 삭제 버튼 제어)
+      document.getElementById("adminPanel").classList.remove("hidden");
+      document.getElementById("adminError").textContent="";
+      await loadPending();
+      await renderApproved(); // 관리자 뷰에서 삭제 버튼 보이도록 재렌더
+    };
+  }
+
+  async function loadPending(){
+    const list=document.getElementById("pendingList");
+    const qSnap=await getDocs(query(collection(db,"sentences"),where("status","==","pending"), orderBy("createdAt","desc")));
+    list.innerHTML="";
+    qSnap.forEach(docSnap=>{
+      const d=docSnap.data();
+      const item=document.createElement("div");
+      item.className="feed-item";
+      item.innerHTML = `
+        ${d.text}
+        <div class="mut">작성자: ${d.id}</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button data-id="${docSnap.id}" class="btn btnReject">반려</button>
+          <button data-id="${docSnap.id}" class="btn primary btnApprove">승인</button>
+        </div>`;
+      list.appendChild(item);
+    });
+    list.querySelectorAll(".btnReject").forEach(b=>{
+      b.onclick=async()=>{ await deleteDoc(doc(db,"sentences",b.dataset.id)); loadPending(); };
+    });
+    list.querySelectorAll(".btnApprove").forEach(b=>{
+      b.onclick=async()=>{
+        await updateDoc(doc(db,"sentences",b.dataset.id),{status:"approved"});
+        await loadPending(); await renderApproved();
+      };
+    });
+  }
 </script>
 </body>
 </html>
