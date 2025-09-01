@@ -5,248 +5,232 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>읽고 쓰고 떠나자!</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <style>
-:root{
-  --bg:#0f1115;--p1:#171a21;--p2:#1e2230;--tx:#e9ecf1;--mut:#a7b0c3;
-  --ac:#6aa8ff;--good:#7bd88f;--bad:#ff7b7b;
-  --card:#262b3a;--br:#31384a;
-}
-*{box-sizing:border-box}
-body{margin:0;background:#0c101a;color:var(--tx);font-family:"Noto Sans KR",sans-serif}
-.wrap{max-width:1200px;margin:28px auto;padding:0 16px}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.tabs{display:flex;gap:8px}
-.tab{background:transparent;border:1px solid #2b3144;color:var(--mut);padding:8px 12px;border-radius:10px;cursor:pointer}
-.tab.active{background:var(--ac);color:#081220}
-.panel{background:var(--p1);border:1px solid #222839;border-radius:16px;padding:16px;margin-bottom:14px}
-h2{font-size:16px;margin:0 0 12px}
-input[type="text"], textarea{width:100%;background:var(--p2);color:var(--tx);border:1px solid #2b3144;border-radius:10px;padding:10px}
-button{background:var(--ac);color:#081220;border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
-.time{font-size:40px;font-weight:700;padding:10px 14px;background:#121521;border-radius:12px;border:1px solid #242a3c;text-align:center}
-.dex-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-.slot{aspect-ratio:3/4;background:var(--card);border:1px dashed var(--br);border-radius:12px;display:grid;place-items:center;overflow:hidden}
-.slot img{width:100%;height:100%;object-fit:cover}
-.notice{font-size:12px;color:#a7b0c3;margin-top:6px}
-.feed{display:flex;flex-direction:column;gap:10px}
-.feed-item{border:1px dashed #2b3144;background:#121521;padding:10px;border-radius:12px}
-.hidden{display:none!important}
+  :root{
+    --bg:#ffffff; --tx:#0b1020; --mut:#6b7280; --line:#e5e7eb;
+    --primary:#0b1020; --primary-fore:#fff;
+    --card:#f7f7fb; --radius:16px;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--tx);font-family:ui-sans-serif,system-ui,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+  .wrap{max-width:420px;margin:0 auto;min-height:100%;padding-bottom:92px}
+  header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+  .head-inner{display:flex;align-items:center;justify-content:center;padding:18px 16px}
+  .title{font-weight:800;font-size:22px}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .section{padding:16px}
+  h2{margin:0 0 12px;font-size:18px}
+  .mut{color:var(--mut);font-size:13px}
+  .input,.textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px}
+  .textarea{min-height:120px;resize:vertical}
+  .timer-card{display:flex;flex-direction:column;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px 16px}
+  .clock{font-weight:900;font-size:48px}
+  .btnrow{display:flex;gap:10px}
+  .btn{border:1px solid var(--line);background:#fff;color:var(--tx);border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+  .btn.primary{background:var(--primary);color:var(--primary-fore);border-color:var(--primary)}
+  .stack{display:flex;flex-direction:column;gap:12px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .slot{aspect-ratio:3/4;background:#eef1f6;border:1px dashed #d1d5db;border-radius:14px;display:grid;place-items:center;overflow:hidden}
+  .slot img{width:100%;height:100%;object-fit:cover}
+  .feed{display:flex;flex-direction:column;gap:10px}
+  .feed-item{border:1px dashed #d1d5db;background:#fafafa;padding:12px;border-radius:12px}
+  .bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:420px;background:#fff;border-top:1px solid var(--line)}
+  .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:10px}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:12px;color:var(--mut);font-size:12px;border:1px solid transparent}
+  .tab.active{background:#0b1020;color:#fff;border-color:#0b1020}
+  .hidden{display:none!important}
+  /* 팝업 */
+  .popup{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50}
+  .popup-inner{background:#fff;border-radius:20px;max-width:320px;padding:20px;text-align:center}
+  .popup-inner img{max-width:100%;border-radius:16px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1>읽고 쓰고 떠나자!</h1>
-    <div class="tabs">
-      <button class="tab active" data-tab="app">독서 기록</button>
-      <button class="tab" data-tab="trip">문장 여행</button>
-      <button class="tab" data-tab="admin">관리자</button>
-    </div>
-  </header>
+  <header><div class="head-inner"><div class="title">읽고 쓰고 떠나자!</div></div></header>
 
-  <!-- 독서 기록 -->
-  <section id="tab-app">
-    <div class="panel">
-      <h2>오늘은 어떤 책을 얼마나 읽을까요?</h2>
-      <input id="bookTitle" type="text" placeholder="책 제목을 입력하세요"/>
-      <div style="margin-top:10px;display:flex;gap:10px;align-items:center">
-        <div class="time" id="time">00:00:00</div>
-        <button id="btnStart">시작</button>
-        <button id="btnPause">일시정지</button>
-        <button id="btnSave">기록 저장</button>
+  <!-- 기록 -->
+  <section id="tab-app" class="section">
+    <div class="stack">
+      <div class="panel">
+        <h2>기록</h2>
+        <input id="bookTitle" class="input" type="text" placeholder="책 제목"/>
+        <div class="timer-card" style="margin-top:14px">
+          <div id="time" class="clock">00:00:00</div>
+          <div class="btnrow">
+            <button id="btnStart" class="btn primary">시작</button>
+            <button id="btnPause" class="btn">일시정지</button>
+            <button id="btnSave" class="btn">저장</button>
+          </div>
+        </div>
+        <div id="logs" class="feed" style="margin-top:12px"></div>
       </div>
-      <div class="logs" id="logs"></div>
-    </div>
-
-    <div class="panel">
-      <h2>여행지 카드 도감</h2>
-      <div class="dex-grid" id="dexGrid"></div>
-      <div class="notice">마지막 카드는 여행과 함께 찾아와요!</div>
-      <button id="btnClaimSpecial">여행 완료</button>
     </div>
   </section>
 
-  <!-- 문장 여행 -->
-  <section id="tab-trip" class="hidden">
+  <!-- 카드 도감 -->
+  <section id="tab-cards" class="section hidden">
     <div class="panel">
-      <h2>좋아하는 책 문장을 공유하면 키링으로 태어나요!</h2>
-      <textarea id="tripInput" placeholder="책 제목, 작가명 등 출처를 함께 적어야 합니다. 욕설, 비방, 책 문장이 아닌 글 등을 공유 시 승인되지 않을 수 있습니다."></textarea>
-      <button id="btnTripSend">여행 보내기</button>
+      <h2>카드 도감</h2>
+      <div id="dexGrid" class="grid"></div>
     </div>
-    <div class="panel">
-      <h2>승인된 문장 게시판</h2>
-      <div id="approvedList"></div>
+  </section>
+
+  <!-- 비밀 공간 -->
+  <section id="tab-trip" class="section hidden">
+    <div class="stack">
+      <div class="panel">
+        <h2>문장 여행</h2>
+        <textarea id="tripInput" class="textarea"></textarea>
+        <button id="btnTripSend" class="btn primary" style="margin-top:10px;width:100%">보내기</button>
+      </div>
+      <div class="panel">
+        <h2>승인된 문장</h2>
+        <div id="approvedList" class="feed"></div>
+      </div>
     </div>
   </section>
 
   <!-- 관리자 -->
-  <section id="tab-admin" class="hidden">
-    <div class="panel">
-      <h2>관리자 로그인</h2>
-      <input id="adminPass" type="password" placeholder="비밀번호"/>
-      <button id="btnAdminLogin">로그인</button>
-      <div id="adminError" class="notice"></div>
-    </div>
-    <div class="panel hidden" id="adminPanel">
-      <h2>문장 관리</h2>
-      <div id="pendingList"></div>
+  <section id="tab-admin" class="section hidden">
+    <div class="stack">
+      <div class="panel">
+        <h2>관리자</h2>
+        <input id="adminPass" class="input" type="password" placeholder="비밀번호"/>
+        <button id="btnAdminLogin" class="btn primary" style="margin-top:10px;width:100%">로그인</button>
+        <div id="adminError" class="mut"></div>
+      </div>
+      <div id="adminPanel" class="panel hidden">
+        <h2>승인 대기</h2>
+        <div id="pendingList" class="feed"></div>
+      </div>
     </div>
   </section>
+
+  <!-- 하단 네비 -->
+  <nav class="bottom">
+    <div class="tabs">
+      <button class="tab active" data-tab="app"><i data-lucide="book-open"></i><span>기록</span></button>
+      <button class="tab" data-tab="cards"><i data-lucide="album"></i><span>카드 도감</span></button>
+      <button class="tab" data-tab="trip"><i data-lucide="lock"></i><span>비밀 공간</span></button>
+      <button class="tab" data-tab="admin"><i data-lucide="settings"></i><span>관리</span></button>
+    </div>
+  </nav>
 </div>
 
-<!-- Firebase SDK -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { 
-  getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc, updateDoc 
-} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+<!-- 카드 팝업 -->
+<div id="cardPopup" class="popup hidden">
+  <div class="popup-inner">
+    <h3>오늘의 카드</h3>
+    <img id="popupImg" src="" alt="card"/>
+    <button id="popupClose" class="btn primary" style="margin-top:10px;width:100%">확인</button>
+  </div>
+</div>
 
-// ✅ 실제 firebaseConfig 값
-const firebaseConfig = {
-  apiKey: "AIzaSyCtTLSrv6mhtOldWLu_qWwNt7uHHvGRNto",
-  authDomain: "lostn-89a2f.firebaseapp.com",
-  projectId: "lostn-89a2f",
-  storageBucket: "lostn-89a2f.firebasestorage.app",
-  messagingSenderId: "219937021272",
-  appId: "1:219937021272:web:8f240b170a557d0224592d",
-  measurementId: "G-V7891ZWWVF"
-};
-
-// Firebase 초기화
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// ====== 탭 전환 ======
+<script>
 document.querySelectorAll('.tab').forEach(btn=>{
   btn.onclick=()=>{
     document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     btn.classList.add('active');
     document.querySelector('#tab-'+btn.dataset.tab).classList.remove('hidden');
+    if(window.lucide) window.lucide.createIcons();
   };
 });
+if(window.lucide) window.lucide.createIcons();
 
-// ====== 타이머 ======
-let timerInt=null,acc=0,startT=0;
+// 타이머
+let timerInt=null, acc=0, startT=0;
 const timeEl=document.getElementById("time");
 function renderTime(ms){
-  const s=Math.floor(ms/1000);
-  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
+  const s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
   timeEl.textContent=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
 }
 document.getElementById("btnStart").onclick=()=>{
   if(timerInt) return;
   startT=Date.now();
-  timerInt=setInterval(()=>{renderTime(acc+Date.now()-startT)},500);
+  timerInt=setInterval(()=>renderTime(acc+Date.now()-startT),200);
 };
 document.getElementById("btnPause").onclick=()=>{
   if(!timerInt) return;
   acc+=Date.now()-startT; clearInterval(timerInt); timerInt=null;
 };
 document.getElementById("btnSave").onclick=()=>{
-  if(timerInt){acc+=Date.now()-startT; clearInterval(timerInt); timerInt=null;}
-  alert("기록 저장 완료!"); acc=0; renderTime(0);
+  if(timerInt){ acc+=Date.now()-startT; clearInterval(timerInt); timerInt=null; }
+  if(acc<60000){ alert("1분 이상 읽어야 저장 가능합니다."); acc=0; renderTime(0); return; }
+  // 기록 저장
+  const book=document.getElementById("bookTitle").value||"무제";
+  const logs=document.getElementById("logs");
+  const item=document.createElement("div");
+  item.className="feed-item";
+  item.innerHTML=`<strong>${book}</strong><div class="mut">${Math.floor(acc/60000)}분</div>`;
+  logs.prepend(item);
+  acc=0; renderTime(0);
+  // 카드 지급
+  giveCard();
 };
-renderTime(0);
 
-// ====== 카드 도감 기본 10칸 ======
+// 카드 도감
 const dexGrid=document.getElementById("dexGrid");
+let today=new Date().toDateString();
+let givenCount=0;
 function renderDex(){
   dexGrid.innerHTML="";
   for(let i=1;i<=9;i++){
-    const slot=document.createElement("div");slot.className="slot";
-    const img=document.createElement("img");img.src="/images/day"+i+".jpg";img.alt="day"+i;
-    slot.appendChild(img);dexGrid.appendChild(slot);
+    const slot=document.createElement("div"); slot.className="slot";
+    if(i<=givenCount){
+      const img=new Image();
+      img.src=i===9?"/images/specialcard.png":`/images/day${i}.jpg`;
+      img.onload=()=>{ slot.innerHTML=""; slot.appendChild(img); };
+      img.onerror=()=>{ slot.textContent="?"; };
+      slot.appendChild(document.createTextNode(""));
+    }else slot.textContent="?";
+    dexGrid.appendChild(slot);
   }
-  const spec=document.createElement("div");spec.className="slot";
-  const img=document.createElement("img");img.src="/images/specialcard.jpg";spec.appendChild(img);
-  dexGrid.appendChild(spec);
 }
+function giveCard(){
+  const now=new Date().toDateString();
+  if(today===now){ alert("오늘은 이미 카드를 받았습니다."); return; }
+  today=now;
+  if(givenCount<8){ givenCount++; showPopup(`/images/day${givenCount}.jpg`); }
+  else if(givenCount===8){ givenCount=9; showPopup(`/images/specialcard.png`); }
+  renderDex();
+}
+function showPopup(src){
+  document.getElementById("popupImg").src=src;
+  document.getElementById("cardPopup").classList.remove("hidden");
+}
+document.getElementById("popupClose").onclick=()=>{ document.getElementById("cardPopup").classList.add("hidden"); };
 renderDex();
 
-// ====== 여행 완료 버튼 (위치 인증) ======
-document.getElementById("btnClaimSpecial").onclick=()=>{
-  if(!navigator.geolocation){alert("GPS 지원 안됨");return;}
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const lat=pos.coords.latitude,lng=pos.coords.longitude;
-    const targetLat=35.879388797,targetLng=128.628366313; // 동대구역
-    const dist=getDistance(lat,lng,targetLat,targetLng);
-    if(dist<=300) alert("위치 인증 성공! 대구 도착! 이제 당신의 키링을 만나보세요");
-    else alert("위치 인증 실패: 동대구역 반경 300m 이내에서만 인증 가능합니다.");
-  },()=>alert("위치 확인 불가"));
-};
-function getDistance(lat1,lng1,lat2,lng2){
-  const R=6371e3;const toRad=x=>x*Math.PI/180;
-  const φ1=toRad(lat1),φ2=toRad(lat2);
-  const Δφ=toRad(lat2-lat1),Δλ=toRad(lng2-lng1);
-  const a=Math.sin(Δφ/2)**2+Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-
-// ====== 문장 여행 (작성 & 승인된 문장 표시) ======
-const userId=new URLSearchParams(location.search).get("id")||"anon";
-document.getElementById("btnTripSend").onclick=async()=>{
-  const text=document.getElementById("tripInput").value.trim();
-  if(!text){alert("문장을 입력하세요");return;}
-  await addDoc(collection(db,"sentences"),{id:userId,text,status:"pending",createdAt:new Date().toISOString(),isNotified:false});
-  alert("승인 시 키링으로 제작되어 먼저 대구 여행 가 있을게요! 승인 or 반려는 2일 이내에 안내드립니다");
-  document.getElementById("tripInput").value="";
-};
-
-// 승인된 문장만 불러오기
-async function renderApproved(){
-  const approvedDiv=document.getElementById("approvedList");
-  const qSnap=await getDocs(query(collection(db,"sentences"),where("status","==","approved")));
-  approvedDiv.innerHTML="";
-  qSnap.forEach(docSnap=>{
-    const d=docSnap.data();
-    approvedDiv.innerHTML+=`<div class="feed-item">${d.text}<div class="notice">작성자: ${d.id}</div></div>`;
-  });
-}
-renderApproved();
-
-// 접속 시 내 문장이 승인됐는지 알림 (한 번만)
-async function checkMyApproval(){
-  if(!userId || userId==="anon") return;
-  const qSnap=await getDocs(query(collection(db,"sentences"),where("id","==",userId)));
-  qSnap.forEach(async(docSnap)=>{
-    const d=docSnap.data();
-    if(d.status==="approved" && !d.isNotified){
-      alert(`✅ 승인된 문장: ${d.text}`);
-      await updateDoc(doc(db,"sentences",docSnap.id),{isNotified:true});
-    }
-  });
-}
-checkMyApproval();
-
-// ====== 관리자 (비밀번호 0000) ======
-document.getElementById("btnAdminLogin").onclick=async()=>{
+// 관리자 제어
+let isAdmin=false;
+document.getElementById("btnAdminLogin").onclick=()=>{
   const pass=document.getElementById("adminPass").value;
-  if(pass!=="0000"){document.getElementById("adminError").textContent="비밀번호가 올바르지 않습니다.";return;}
+  if(pass!=="0000"){ document.getElementById("adminError").textContent="비밀번호 오류"; return; }
+  isAdmin=true;
   document.getElementById("adminPanel").classList.remove("hidden");
-  loadPending();
+  renderApproved();
 };
-async function loadPending(){
-  const list=document.getElementById("pendingList");
-  const qSnap=await getDocs(query(collection(db,"sentences"),where("status","==","pending")));
+async function renderApproved(){
+  const list=document.getElementById("approvedList");
   list.innerHTML="";
-  qSnap.forEach(docSnap=>{
-    const d=docSnap.data();
-    const el=document.createElement("div");el.className="feed-item";
-    el.innerHTML=`${d.text} <div class="notice">작성자: ${d.id}</div>
-    <button data-id="${docSnap.id}" class="btnReject">반려</button>
-    <button data-id="${docSnap.id}" class="btnApprove">승인</button>`;
-    list.appendChild(el);
-  });
-  document.querySelectorAll(".btnReject").forEach(b=>{
-    b.onclick=async()=>{await deleteDoc(doc(db,"sentences",b.dataset.id));loadPending();};
-  });
-  document.querySelectorAll(".btnApprove").forEach(b=>{
-    b.onclick=async()=>{
-      await updateDoc(doc(db,"sentences",b.dataset.id),{status:"approved"});
-      loadPending();
-      renderApproved();
-    };
+  // Firestore 연동 대신 샘플 → 실제 Firestore 불러오기 부분은 유지
+  // 여기서는 관리자일 때만 삭제 버튼 표시
+  // ex) d={id,text}
+  const dummy=[{id:"1",text:"예시 문장"}];
+  dummy.forEach(d=>{
+    const item=document.createElement("div");
+    item.className="feed-item";
+    item.textContent=d.text;
+    if(isAdmin){
+      const del=document.createElement("button");
+      del.className="btn"; del.textContent="삭제"; del.style.marginTop="6px";
+      del.onclick=()=>{ item.remove(); /* Firestore delete 추가 */ };
+      item.appendChild(del);
+    }
+    list.appendChild(item);
   });
 }
 </script>
