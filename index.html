@@ -120,12 +120,15 @@
   </nav>
 </div>
 
-<!-- 카드 팝업 -->
+<!-- 오늘의 카드 팝업 (궁금해요/닫기) -->
 <div id="cardPopup" class="popup">
   <div class="popup-inner">
     <h3 style="margin-top:0">오늘의 카드</h3>
     <img id="popupImg" src="" alt="card"/>
-    <button id="popupClose" class="btn primary" style="margin-top:10px;width:100%">확인</button>
+    <div style="display:flex; gap:8px; margin-top:10px">
+      <button id="popupCurious" class="btn primary" style="flex:1">궁금해요</button>
+      <button id="popupClose" class="btn" style="flex:1">닫기</button>
+    </div>
   </div>
 </div>
 
@@ -178,26 +181,54 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function ymd(ts){ const d=new Date(ts ?? Date.now()); return `${d.getFullYear()}-${(d.getMonth()+1+'').padStart(2,'0')}-${(d.getDate()+'').padStart(2,'0')}`; }
 
-  /* ---------- 카드 팝업 ---------- */
-  const popup=document.getElementById("cardPopup");
-  const popupImg=document.getElementById("popupImg");
-  const popupQueue=[];
-  function showPopupBySrc(src){
+  /* ---------- 오늘의 카드 팝업 (링크 매핑) ---------- */
+  const popup = document.getElementById("cardPopup");
+  const popupImg = document.getElementById("popupImg");
+  const btnCurious = document.getElementById("popupCurious");
+  const btnClose = document.getElementById("popupClose");
+  const popupQueue = [];
+
+  // day → 이동할 html 매핑
+  const curiosityMap = {
+    1: "./day1-page15.html",
+    2: "./day2-page2.html",
+    3: "./day3-page21.html",
+    4: "./day4-page17.html",
+    5: "./day5-page12.html",
+    6: "./day6-page5.html",
+    7: "./day7-page6.html",
+    8: "./day8-page3.html",
+  };
+
+  let currentPopupDay = null;
+
+  function showPopupBySrc(src) {
     popupImg.src = src;
+    const m = src.match(/day(\d)\.jpg$/);
+    currentPopupDay = m ? Number(m[1]) : null;
+
+    if (currentPopupDay && curiosityMap[currentPopupDay]) {
+      btnCurious.style.display = "";
+      btnCurious.onclick = () => { window.location.href = curiosityMap[currentPopupDay]; };
+    } else {
+      btnCurious.style.display = "none";
+      btnCurious.onclick = null;
+    }
     popup.classList.add('show');
   }
-  document.getElementById("popupClose").addEventListener('click', () => {
+
+  btnClose.addEventListener("click", () => {
     popup.classList.remove('show');
     if (popupQueue.length){ const next=popupQueue.shift(); showPopupBySrc(next); }
   });
-  // 팝업 영역 클릭해도 닫히게
-  popup.addEventListener('click', (e)=>{
+
+  popup.addEventListener("click", (e)=>{
     if(e.target === popup){ popup.classList.remove('show'); }
   });
 
   /* ---------- 카드 도감 렌더 ---------- */
   const dexGrid=document.getElementById("dexGrid");
-  async function renderDex(){
+  function renderDex(){
     dexGrid.innerHTML="";
     for(let i=1;i<=9;i++){
       const slot=document.createElement("div"); slot.className="slot";
@@ -208,9 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         img.src = "./blankcard.png";
       }
       img.onload=()=>{ slot.innerHTML=""; slot.appendChild(img); };
-      img.onerror=()=>{ // 로딩 실패 시 blank로 대체
-        const fb=new Image(); fb.src="./blankcard.png"; fb.onload=()=>{slot.innerHTML=""; slot.appendChild(fb);};
-      };
+      img.onerror=()=>{ const fb=new Image(); fb.src="./blankcard.png"; fb.onload=()=>{slot.innerHTML=""; slot.appendChild(fb);} };
       slot.appendChild(document.createTextNode(""));
       dexGrid.appendChild(slot);
     }
@@ -237,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       const first=popupQueue.shift(); showPopupBySrc(first);
     } else if (state.givenCount === 8) {
-      // 방어: 혹시 여기 들어오면 스페셜 즉시
+      // 방어
       state.givenCount = 9; state.lastClaimDate = today; persist(); renderDex();
       showPopupBySrc(`./specialcard.png`);
     } else {
@@ -271,11 +300,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const book=document.getElementById("bookTitle").value||"무제";
     const log={ book, ms:acc, at:Date.now() };
     state.logs.unshift(log); persist(); pushLogUI(log);
-    giveCardAfterSave(); // 카드 지급 + 팝업
-    acc=0; renderTime(0); // 성공 저장 후에만 초기화
+    giveCardAfterSave(); // 카드 지급 + 팝업(궁금해요/닫기)
+    acc=0; renderTime(0); // 성공 저장 후만 초기화
   });
 
-  // 전역으로 admin 플래그 노출 (파이어베이스 스크립트에서 사용)
+  // 전역 관리자 플래그 (Firebase 스크립트에서 사용)
   window.__isAdmin = false;
 });
 </script>
@@ -300,7 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-
   const userId = new URLSearchParams(location.search).get("id") || "anon";
 
   /* ----- 문장 전송 (pending 생성) ----- */
@@ -367,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById("adminPanel").classList.remove("hidden");
       document.getElementById("adminError").textContent="";
 
-      // 관리자 전환 후, 승인된 리스트를 삭제버튼 포함으로 다시 그림
+      // 관리자 전환 후, 승인 리스트를 삭제버튼 포함으로 다시 그림
       const approvedSnap = await getDocs(approvedQ);
       renderApprovedSnapshot(approvedSnap);
 
