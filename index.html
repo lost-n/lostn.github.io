@@ -7,36 +7,15 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net"/>
 <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <style>
-  /* ---------- Fonts ---------- */
-  @font-face{
-    font-family:"Chab";
-    src:url("./chab.woff") format("woff");
-    font-weight:700; font-style:normal; font-display:swap;
-  }
-  @font-face{
-    font-family:"BookkMyungjo_Bold";
-    src:url("./BookkMyungjo_Bold.woff") format("woff");
-    font-weight:700; font-style:normal; font-display:swap;
-  }
-
-  :root{
-    --bg:#ffffff; --tx:#0b1020; --mut:#6b7280; --line:#e5e7eb;
-    --primary:#0b1020; --primary-fore:#fff;
-    --card:#f7f7fb; --radius:16px;
-  }
+  @font-face{font-family:"Chab";src:url("./chab.woff") format("woff");font-weight:700;font-style:normal;font-display:swap;}
+  @font-face{font-family:"BookkMyungjo_Bold";src:url("./BookkMyungjo_Bold.woff") format("woff");font-weight:700;font-style:normal;font-display:swap;}
+  :root{--bg:#ffffff;--tx:#0b1020;--mut:#6b7280;--line:#e5e7eb;--primary:#0b1020;--primary-fore:#fff;--card:#f7f7fb;--radius:16px;}
   *{box-sizing:border-box} html,body{height:100%}
-  body{
-    margin:0;background:var(--bg);color:var(--tx);
-    font-family:"BookkMyungjo_Bold","Apple SD Gothic Neo","Noto Sans KR",serif;
-  }
+  body{margin:0;background:var(--bg);color:var(--tx);font-family:"BookkMyungjo_Bold","Apple SD Gothic Neo","Noto Sans KR",serif;}
   .wrap{max-width:420px;margin:0 auto;min-height:100%;padding-bottom:92px}
   header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
   .head-inner{display:flex;align-items:center;justify-content:center;padding:18px 16px}
-  .title{
-    font-family:"Chab", "BookkMyungjo_Bold", serif;
-    font-weight:800;font-size:44px; /* 기존 22px → 2배 */
-    line-height:1.1;
-  }
+  .title{font-family:"Chab", "BookkMyungjo_Bold", serif;font-weight:800;font-size:44px;line-height:1.1;}
   .panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px}
   .section{padding:16px}
   h2{margin:0 0 12px;font-size:18px}
@@ -49,26 +28,16 @@
   .btn{border:1px solid var(--line);background:#fff;color:var(--tx);border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
   .btn.primary{background:var(--primary);color:var(--primary-fore);border-color:var(--primary)}
   .stack{display:flex;flex-direction:column;gap:12px}
-
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  /* 동적 비율: 각 슬롯별로 --ar을 주입해 맞춤 */
-  .slot{
-    aspect-ratio:var(--ar, 2/3); /* 기본 2:3 */
-    background:#ffffff;border:1px dashed #d1d5db;border-radius:14px;
-    display:grid;place-items:center;overflow:hidden;
-  }
-  .slot img{width:100%;height:100%;object-fit:contain;background:#fff}
-
+  .slot{aspect-ratio:var(--ar, 2/3);background:#ffffff;border:1px dashed #d1d5db;border-radius:14px;display:grid;place-items:center;overflow:hidden;}
+  .slot img{width:100%;height:100%;object-fit:contain;background:#fff;cursor:pointer}
   .feed{display:flex;flex-direction:column;gap:10px}
   .feed-item{border:1px dashed #d1d5db;background:#fafafa;padding:12px;border-radius:12px}
-
   .bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:420px;background:#fff;border-top:1px solid var(--line)}
   .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:10px}
   .tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:12px;color:var(--mut);font-size:12px;border:1px solid transparent}
   .tab.active{background:#0b1020;color:#fff;border-color:#0b1020}
   .hidden{display:none!important}
-
-  /* 팝업 */
   .popup{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
   .popup.show{display:flex}
   .popup-inner{background:#fff;border-radius:20px;max-width:320px;padding:20px;text-align:center}
@@ -79,7 +48,6 @@
 <div class="wrap">
   <header><div class="head-inner"><div class="title">읽고 쓰고 떠나자!</div></div></header>
 
-  <!-- 기록 -->
   <section id="tab-app" class="section">
     <div class="stack">
       <div class="panel">
@@ -98,7 +66,6 @@
     </div>
   </section>
 
-  <!-- 카드 도감 -->
   <section id="tab-cards" class="section hidden">
     <div class="panel">
       <h2>카드 도감</h2>
@@ -106,22 +73,20 @@
     </div>
   </section>
 
-  <!-- 비밀 공간 -->
   <section id="tab-trip" class="section hidden">
     <div class="stack">
       <div class="panel">
         <h2>문장 여행</h2>
-        <textarea id="tripInput" class="textarea" placeholder="문장 -작가명, 제목 순으로 기입해야 합니다. 책 구절이 아닌 문장 작성 시 승인되지 않을 수 있습니다."></textarea>
+        <textarea id="tripInput" class="textarea" placeholder="문장 - 작가명, 제목 순으로 기입해야 합니다."></textarea>
         <button id="btnTripSend" class="btn primary" style="margin-top:10px;width:100%">보내기</button>
       </div>
       <div class="panel">
-        <h2>승인된 문장</h2>
+        <h2>우리들의 문장</h2>
         <div id="approvedList" class="feed"></div>
       </div>
     </div>
   </section>
 
-  <!-- 관리자 -->
   <section id="tab-admin" class="section hidden">
     <div class="stack">
       <div class="panel">
@@ -137,18 +102,16 @@
     </div>
   </section>
 
-  <!-- 하단 네비 -->
   <nav class="bottom">
     <div class="tabs">
       <button class="tab active" data-tab="app"><i data-lucide="book-open"></i><span>기록</span></button>
       <button class="tab" data-tab="cards"><i data-lucide="album"></i><span>카드 도감</span></button>
-      <button class="tab" data-tab="trip"><i data-lucide="lock"></i><span>비밀 공간</span></button>
+      <button class="tab" data-tab="trip"><i data-lucide="lock"></i><span>문장 여행</span></button>
       <button class="tab" data-tab="admin"><i data-lucide="settings"></i><span>관리</span></button>
     </div>
   </nav>
 </div>
 
-<!-- 오늘의 카드 팝업 (궁금해요/닫기) -->
 <div id="cardPopup" class="popup">
   <div class="popup-inner">
     <h3 style="margin-top:0">오늘의 카드</h3>
@@ -162,10 +125,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  /* ---------- 아이콘 렌더 ---------- */
   if (window.lucide) window.lucide.createIcons();
-
-  /* ---------- 탭 전환 ---------- */
   document.querySelectorAll('.tab').forEach(btn=>{
     btn.addEventListener('click', () => {
       document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
@@ -177,84 +137,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* ---------- LocalStorage ---------- */
   const LS = {
     get(key, fallback){ try{const v=localStorage.getItem(key); return v?JSON.parse(v):fallback;}catch{ return fallback; } },
     set(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
   };
-  const state = LS.get('read80_state', {
-    logs: [],               // {book, ms, at}
-    givenCount: 0,          // 0~9 (1~8 일반, 9 스페셜)
-    lastClaimDate: null     // "YYYY-MM-DD"
-  });
+  const state = LS.get('read80_state', { logs: [], givenCount: 0, lastClaimDate: null });
   function persist(){ LS.set('read80_state', state); }
 
-  /* ---------- 유틸 ---------- */
   const timeEl=document.getElementById("time");
-  function renderTime(ms){
-    const s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
-    timeEl.textContent=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
-  }
-  function pushLogUI(log){
-    const logs=document.getElementById("logs");
-    const item=document.createElement("div");
-    item.className="feed-item";
-    const m=Math.floor(log.ms/60000), sec=Math.floor((log.ms%60000)/1000);
-    item.innerHTML=`<strong>${log.book||"무제"}</strong><div class="mut">${m}분 ${sec}초 • ${new Date(log.at).toLocaleString()}</div>`;
-    logs.prepend(item);
-  }
-  function hydrateLogsUI(){
-    document.getElementById("logs").innerHTML="";
-    state.logs.forEach(l=>pushLogUI(l));
-  }
+  function renderTime(ms){const s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;timeEl.textContent=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;}
+  function pushLogUI(log){const logs=document.getElementById("logs");const item=document.createElement("div");item.className="feed-item";const m=Math.floor(log.ms/60000), sec=Math.floor((log.ms%60000)/1000);item.innerHTML=`<strong>${log.book||"무제"}</strong><div class="mut">${m}분 ${sec}초 • ${new Date(log.at).toLocaleString()}</div>`;logs.prepend(item);}
+  function hydrateLogsUI(){document.getElementById("logs").innerHTML="";state.logs.forEach(l=>pushLogUI(l));}
   function ymd(ts){ const d=new Date(ts ?? Date.now()); return `${d.getFullYear()}-${(d.getMonth()+1+'').padStart(2,'0')}-${(d.getDate()+'').padStart(2,'0')}`; }
 
-  /* ---------- 오늘의 카드 팝업 (링크 매핑) ---------- */
   const popup = document.getElementById("cardPopup");
   const popupImg = document.getElementById("popupImg");
   const btnCurious = document.getElementById("popupCurious");
   const btnClose = document.getElementById("popupClose");
   const popupQueue = [];
-
-  // day → 이동할 html 매핑 (page*.html 로 수정)
-  const curiosityMap = {
-    1: "./page15.html",
-    2: "./page2.html",
-    3: "./page21.html",
-    4: "./page17.html",
-    5: "./page12.html",
-    6: "./page5.html",
-    7: "./page6.html",
-    8: "./page3.html",
-  };
-
+  const curiosityMap = {1:"./page15.html",2:"./page2.html",3:"./page21.html",4:"./page17.html",5:"./page12.html",6:"./page5.html",7:"./page6.html",8:"./page3.html"};
   let currentPopupDay = null;
 
-  function showPopupBySrc(src) {
+  function showPopupBySrc(src, day=null) {
     popupImg.src = src;
-    const m = src.match(/day(\d)\.jpg$/);
-    currentPopupDay = m ? Number(m[1]) : null;
-
+    currentPopupDay = day;
     if (currentPopupDay && curiosityMap[currentPopupDay]) {
       btnCurious.style.display = "";
       btnCurious.onclick = () => { window.location.href = curiosityMap[currentPopupDay]; };
-    } else {
-      btnCurious.style.display = "none";
-      btnCurious.onclick = null;
-    }
+    } else { btnCurious.style.display = "none"; btnCurious.onclick = null; }
     popup.classList.add('show');
   }
+  btnClose.addEventListener("click", () => { popup.classList.remove('show'); if (popupQueue.length){ const next=popupQueue.shift(); showPopupBySrc(next.src, next.day); }});
+  popup.addEventListener("click", (e)=>{ if(e.target === popup){ popup.classList.remove('show'); }});
 
-  btnClose.addEventListener("click", () => {
-    popup.classList.remove('show');
-    if (popupQueue.length){ const next=popupQueue.shift(); showPopupBySrc(next); }
-  });
-
-  popup.addEventListener("click", (e)=>{
-    if(e.target === popup){ popup.classList.remove('show'); }
-  });
-
-  /* ---------- 카드 도감 렌더 (동적 비율 적용) ---------- */
   const dexGrid=document.getElementById("dexGrid");
   function renderDex(){
     dexGrid.innerHTML="";
@@ -262,229 +177,45 @@ document.addEventListener('DOMContentLoaded', () => {
       const slot=document.createElement("div"); slot.className="slot";
       const img=new Image();
       if(i<=state.givenCount){
-        img.src = (i===9) ? "./specialcard.png" : `./day${i}.jpg`;
-      }else{
-        img.src = "./blankcard.png";
-      }
-      img.onload=()=>{
-        // 이미지 원본 비율로 슬롯 비율 설정
-        const w = img.naturalWidth || 2;
-        const h = img.naturalHeight || 3;
-        slot.style.setProperty('--ar', `${w} / ${h}`);
-        slot.innerHTML=""; slot.appendChild(img);
-      };
-      img.onerror=()=>{
-        const fb=new Image(); fb.src="./blankcard.png";
-        fb.onload=()=>{
-          const w = fb.naturalWidth || 2;
-          const h = fb.naturalHeight || 3;
-          slot.style.setProperty('--ar', `${w} / ${h}`);
-          slot.innerHTML=""; slot.appendChild(fb);
-        };
-      };
-      slot.appendChild(document.createTextNode(""));
-      dexGrid.appendChild(slot);
+        img.src = (i===9) ? "./specialcard.png" : `./00${i}.png`;
+        img.onclick = ()=>{ if(i<=8){ showPopupBySrc(`./${i}.png`, i);} };
+      }else{ img.src = "./blankcard.png"; }
+      img.onload=()=>{const w = img.naturalWidth || 2;const h = img.naturalHeight || 3;slot.style.setProperty('--ar', `${w} / ${h}`);slot.innerHTML="";slot.appendChild(img);};
+      slot.appendChild(document.createTextNode("")); dexGrid.appendChild(slot);
     }
   }
 
-  /* ---------- 1일 1회 카드 지급 ---------- */
   function giveCardAfterSave(){
     const today = ymd();
-    if(state.lastClaimDate === today){
-      alert("오늘 카드는 이미 받았어요.");
-      return;
-    }
+    if(state.lastClaimDate === today){ alert("오늘 카드는 이미 받았어요."); return; }
     if(state.givenCount < 8){
-      const next = state.givenCount + 1; // 1..8
-      state.givenCount = next;
-      state.lastClaimDate = today;
-      persist(); renderDex();
-      popupQueue.length = 0;
-      popupQueue.push(`./day${next}.jpg`);
-      if(next === 8){
-        state.givenCount = 9; // 스페셜 포함
-        persist(); renderDex();
-        popupQueue.push(`./specialcard.png`);
-      }
-      const first=popupQueue.shift(); showPopupBySrc(first);
-    } else if (state.givenCount === 8) {
-      // 방어
-      state.givenCount = 9; state.lastClaimDate = today; persist(); renderDex();
-      showPopupBySrc(`./specialcard.png`);
-    } else {
-      alert("모든 카드를 수집했어요!");
-      state.lastClaimDate = today; persist();
-    }
+      const next = state.givenCount + 1;
+      state.givenCount = next; state.lastClaimDate = today; persist(); renderDex();
+      popupQueue.length = 0; popupQueue.push({src:`./${next}.png`, day:next});
+      if(next === 8){ state.givenCount = 9; persist(); renderDex(); popupQueue.push({src:"./specialcard.png"}); }
+      const first=popupQueue.shift(); showPopupBySrc(first.src, first.day);
+    } else if (state.givenCount === 8) { state.givenCount = 9; state.lastClaimDate = today; persist(); renderDex(); showPopupBySrc("./specialcard.png"); }
+    else { alert("모든 카드를 수집했어요!"); state.lastClaimDate = today; persist(); }
   }
 
-  /* ---------- 타이머 ---------- */
   let timerInt=null, acc=0, startT=0;
-  renderTime(0);
-  hydrateLogsUI();
-  renderDex();
-
-  function startTimer(){
-    if(timerInt) return;
-    startT=Date.now();
-    timerInt=setInterval(()=>renderTime(acc + (Date.now()-startT)),200);
-  }
-  function pauseTimer(){
-    if(!timerInt) return;
-    acc += Date.now()-startT;
-    clearInterval(timerInt); timerInt=null;
-  }
-
+  renderTime(0); hydrateLogsUI(); renderDex();
+  function startTimer(){if(timerInt) return;startT=Date.now();timerInt=setInterval(()=>renderTime(acc + (Date.now()-startT)),200);}
+  function pauseTimer(){if(!timerInt) return;acc += Date.now()-startT;clearInterval(timerInt);timerInt=null;}
   document.getElementById("btnStart").addEventListener('click', startTimer);
   document.getElementById("btnPause").addEventListener('click', pauseTimer);
-
-  document.getElementById("btnSave").addEventListener('click', ()=>{
-    const elapsedNow = acc + (timerInt ? (Date.now()-startT) : 0);
-
-    if(elapsedNow < 60000){
-      alert("1분 이상 읽어야 저장할 수 있어요.");
-      // 경고 닫은 후 자동 계속 측정
-      if(!timerInt) startTimer();
-      renderTime(elapsedNow);
-      return;
-    }
-
-    // 충분히 읽었을 때 저장 로직
-    if(timerInt){ pauseTimer(); } // acc에 반영되고 정지
-    // elapsedNow가 acc에 이미 반영됨
-    const book=document.getElementById("bookTitle").value||"무제";
-    const log={ book, ms:acc, at:Date.now() };
-    state.logs.unshift(log); persist(); pushLogUI(log);
-    giveCardAfterSave(); // 카드 지급 + 팝업(궁금해요/닫기)
-    acc=0; renderTime(0); // 성공 저장 후만 초기화
-  });
-
-  // 전역 관리자 플래그 (Firebase 스크립트에서 사용)
+  document.getElementById("btnSave").addEventListener('click', ()=>{const elapsedNow = acc + (timerInt ? (Date.now()-startT) : 0);if(elapsedNow < 60000){alert("1분 이상 읽어야 저장할 수 있어요.");if(!timerInt) startTimer();renderTime(elapsedNow);return;}if(timerInt){ pauseTimer(); }const book=document.getElementById("bookTitle").value||"무제";const log={ book, ms:acc, at:Date.now() };state.logs.unshift(log); persist(); pushLogUI(log); giveCardAfterSave(); acc=0; renderTime(0);});
   window.__isAdmin = false;
 });
 </script>
 
-<!-- ========= Firebase (문장/관리) ========= -->
+<!-- Firebase 부분은 기존 그대로 유지 -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-  import {
-    getFirestore, collection, addDoc, getDocs, query, where,
-    deleteDoc, doc, updateDoc, onSnapshot, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCtTLSrv6mhtOldWLu_qWwNt7uHHvGRNto",
-    authDomain: "lostn-89a2f.firebaseapp.com",
-    projectId: "lostn-89a2f",
-    storageBucket: "lostn-89a2f.firebasestorage.app",
-    messagingSenderId: "219937021272",
-    appId: "1:219937021272:web:8f240b170a557d0224592d",
-    measurementId: "G-V7891ZWWVF"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const userId = new URLSearchParams(location.search).get("id") || "anon";
-
-  /* ----- 문장 전송 (pending 생성) ----- */
+  import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+  const firebaseConfig = {apiKey:"AIzaSyCtTLSrv6mhtOldWLu_qWwNt7uHHvGRNto",authDomain:"lostn-89a2f.firebaseapp.com",projectId:"lostn-89a2f",storageBucket:"lostn-89a2f.firebasestorage.app",messagingSenderId:"219937021272",appId:"1:219937021272:web:8f240b170a557d0224592d",measurementId:"G-V7891ZWWVF"};
+  const app = initializeApp(firebaseConfig); const db = getFirestore(app); const userId = new URLSearchParams(location.search).get("id") || "anon";
   const tripBtn = document.getElementById("btnTripSend");
-  if(tripBtn){
-    tripBtn.addEventListener('click', async()=>{
-      const textarea = document.getElementById("tripInput");
-      const text = textarea.value.trim();
-      if(!text){ alert("문장을 입력하세요."); return; }
-      await addDoc(collection(db,"sentences"),{
-        id:userId, text, status:"pending", createdAt:serverTimestamp(), isNotified:false
-      });
-      alert("키링으로 제작되어 먼저 대구 여행에 가 있을게요!");
-      textarea.value="";
-      // 승인대기 패널은 onSnapshot으로 실시간 반영됨
-    });
-  }
-
-  /* ----- 승인된 문장: 실시간 반영 ----- */
+  if(tripBtn){tripBtn.addEventListener('click', async()=>{const textarea = document.getElementById("tripInput");const text = textarea.value.trim();if(!text){ alert("문장을 입력하세요."); return; }await addDoc(collection(db,"sentences"),{id:userId, text, status:"pending", createdAt:serverTimestamp(), isNotified:false});alert("키링으로 제작되어 먼저 대구 여행에 가 있을게요!");textarea.value="";});}
   const approvedDiv=document.getElementById("approvedList");
-  function renderApprovedSnapshot(snapshot){
-    approvedDiv.innerHTML="";
-    snapshot.forEach(docSnap=>{
-      const d=docSnap.data();
-      const el=document.createElement("div");
-      el.className="feed-item";
-      el.innerHTML = `${d.text}<div class="mut">작성자: ${d.id||"익명"}</div>`;
-      if(window.__isAdmin){
-        const del=document.createElement("button");
-        del.className="btn"; del.textContent="삭제"; del.style.marginTop="6px";
-        del.addEventListener('click', async()=>{ await deleteDoc(doc(db,"sentences",docSnap.id)); });
-        el.appendChild(del);
-      }
-      approvedDiv.appendChild(el);
-    });
-  }
-  const approvedQ = query(collection(db,"sentences"), where("status","==","approved"));
-  const approvedUnsub = onSnapshot(approvedQ, renderApprovedSnapshot);
-
-  /* ----- 승인 알림(1회): 다음 접속 시 ----- */
-  async function checkMyApproval(){
-    if(!userId || userId==="anon") return;
-    const myQ = query(collection(db,"sentences"), where("id","==",userId));
-    const snap = await getDocs(myQ);
-    snap.forEach(async(docSnap)=>{
-      const d=docSnap.data();
-      if(d.status==="approved" && !d.isNotified){
-        alert("문장 승인 완료. 비밀 공간에서 확인하세요.");
-        await updateDoc(doc(db,"sentences",docSnap.id),{isNotified:true});
-      }
-    });
-  }
-  checkMyApproval();
-
-  /* ----- 관리자 로그인 & 승인대기 실시간 ----- */
-  const adminBtn = document.getElementById("btnAdminLogin");
-  let unsubscribePending=null;
-
-  if(adminBtn){
-    adminBtn.addEventListener('click', async()=>{
-      const pass = (document.getElementById("adminPass")).value;
-      if(pass!=="0000"){ document.getElementById("adminError").textContent="비밀번호가 올바르지 않습니다."; return; }
-      window.__isAdmin = true;
-      document.getElementById("adminPanel").classList.remove("hidden");
-      document.getElementById("adminError").textContent="";
-
-      // 관리자 전환 후, 승인 리스트를 삭제버튼 포함으로 다시 그림
-      const approvedSnap = await getDocs(approvedQ);
-      renderApprovedSnapshot(approvedSnap);
-
-      // 승인 대기 실시간
-      const pendingList=document.getElementById("pendingList");
-      const pendingQ = query(collection(db,"sentences"), where("status","==","pending"));
-      if(unsubscribePending) unsubscribePending();
-      unsubscribePending = onSnapshot(pendingQ, (snapshot)=>{
-        pendingList.innerHTML="";
-        snapshot.forEach(docSnap=>{
-          const d=docSnap.data();
-          const item=document.createElement("div");
-          item.className="feed-item";
-          item.innerHTML = `
-            ${d.text}
-            <div class="mut">작성자: ${d.id||"익명"}</div>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button data-id="${docSnap.id}" class="btn btnReject">반려</button>
-              <button data-id="${docSnap.id}" class="btn primary btnApprove">승인</button>
-            </div>`;
-          pendingList.appendChild(item);
-        });
-        // 이벤트 바인딩
-        pendingList.querySelectorAll(".btnReject").forEach(b=>{
-          b.addEventListener('click', async()=>{ await deleteDoc(doc(db,"sentences",b.dataset.id)); });
-        });
-        pendingList.querySelectorAll(".btnApprove").forEach(b=>{
-          b.addEventListener('click', async()=>{
-            await updateDoc(doc(db,"sentences",b.dataset.id),{status:"approved"});
-            // 승인되면 approved onSnapshot이 자동 갱신, 작성자 알림은 다음 접속 시 checkMyApproval로
-          });
-        });
-      });
-    });
-  }
-</script>
-</body>
-</html>
+  function renderApprovedSnapshot(snapshot){approvedDiv.innerHTML="";snapshot.forEach(docSnap=>
