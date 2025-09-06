@@ -115,7 +115,8 @@
         <button id="btnTripSend" class="btn primary" style="margin-top:10px;width:100%">보내기</button>
       </div>
       <div class="panel">
-        <h2>승인된 문장</h2>
+        <!-- 변경: '승인된 문장' → '우리들의 문장' -->
+        <h2>우리들의 문장</h2>
         <div id="approvedList" class="feed"></div>
       </div>
     </div>
@@ -142,7 +143,8 @@
     <div class="tabs">
       <button class="tab active" data-tab="app"><i data-lucide="book-open"></i><span>기록</span></button>
       <button class="tab" data-tab="cards"><i data-lucide="album"></i><span>카드 도감</span></button>
-      <button class="tab" data-tab="trip"><i data-lucide="lock"></i><span>비밀 공간</span></button>
+      <!-- 변경: 탭 라벨 '비밀 공간' → '문장 여행' -->
+      <button class="tab" data-tab="trip"><i data-lucide="lock"></i><span>문장 여행</span></button>
       <button class="tab" data-tab="admin"><i data-lucide="settings"></i><span>관리</span></button>
     </div>
   </nav>
@@ -216,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnClose = document.getElementById("popupClose");
   const popupQueue = [];
 
-  // day → 이동할 html 매핑 (page*.html 로 수정)
+  // day → 이동할 html 매핑 (page*.html)
   const curiosityMap = {
     1: "./page15.html",
     2: "./page2.html",
@@ -230,17 +232,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentPopupDay = null;
 
+  // 변경: 팝업 이미지 파일 규칙 day*.jpg → *.png
   function showPopupBySrc(src) {
     popupImg.src = src;
-    const m = src.match(/day(\d)\.jpg$/);
+    const m = src.match(/(?:^|\/)(\d)\.png$/); // ex) "./1.png"
     currentPopupDay = m ? Number(m[1]) : null;
 
     if (currentPopupDay && curiosityMap[currentPopupDay]) {
       btnCurious.style.display = "";
       btnCurious.onclick = () => { window.location.href = curiosityMap[currentPopupDay]; };
+      // 확대된 이미지 클릭 시에도 동일 페이지 이동
+      popupImg.style.cursor = "pointer";
+      popupImg.onclick = () => { window.location.href = curiosityMap[currentPopupDay]; };
     } else {
       btnCurious.style.display = "none";
       btnCurious.onclick = null;
+      popupImg.onclick = null;
+      popupImg.style.cursor = "";
     }
     popup.classList.add('show');
   }
@@ -262,12 +270,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const slot=document.createElement("div"); slot.className="slot";
       const img=new Image();
       if(i<=state.givenCount){
-        img.src = (i===9) ? "./specialcard.png" : `./day${i}.jpg`;
+        // 도감 저장 이미지는 00*.png, 9는 스페셜
+        img.src = (i===9) ? "./specialcard.png" : `./00${i}.png`;
+        if(i<=8){
+          // ✅ 변경: 도감에서 카드 클릭 시 해당 page*.html로 직접 이동
+          img.onclick = () => {
+            const url = curiosityMap[i];
+            if (url) window.location.href = url;
+          };
+          img.style.cursor = "pointer";
+        } else {
+          img.style.cursor = "default";
+        }
       }else{
         img.src = "./blankcard.png";
       }
       img.onload=()=>{
-        // 이미지 원본 비율로 슬롯 비율 설정
         const w = img.naturalWidth || 2;
         const h = img.naturalHeight || 3;
         slot.style.setProperty('--ar', `${w} / ${h}`);
@@ -300,7 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
       state.lastClaimDate = today;
       persist(); renderDex();
       popupQueue.length = 0;
-      popupQueue.push(`./day${next}.jpg`);
+      // 팝업 이미지는 *.png (ex. "./1.png")
+      popupQueue.push(`./${next}.png`);
       if(next === 8){
         state.givenCount = 9; // 스페셜 포함
         persist(); renderDex();
@@ -308,7 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       const first=popupQueue.shift(); showPopupBySrc(first);
     } else if (state.givenCount === 8) {
-      // 방어
       state.givenCount = 9; state.lastClaimDate = today; persist(); renderDex();
       showPopupBySrc(`./specialcard.png`);
     } else {
@@ -348,14 +366,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 충분히 읽었을 때 저장 로직
-    if(timerInt){ pauseTimer(); } // acc에 반영되고 정지
-    // elapsedNow가 acc에 이미 반영됨
+    if(timerInt){ pauseTimer(); }
     const book=document.getElementById("bookTitle").value||"무제";
     const log={ book, ms:acc, at:Date.now() };
     state.logs.unshift(log); persist(); pushLogUI(log);
-    giveCardAfterSave(); // 카드 지급 + 팝업(궁금해요/닫기)
-    acc=0; renderTime(0); // 성공 저장 후만 초기화
+    giveCardAfterSave();
+    acc=0; renderTime(0);
   });
 
   // 전역 관리자 플래그 (Firebase 스크립트에서 사용)
@@ -397,7 +413,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       alert("키링으로 제작되어 먼저 대구 여행에 가 있을게요!");
       textarea.value="";
-      // 승인대기 패널은 onSnapshot으로 실시간 반영됨
     });
   }
 
@@ -449,11 +464,9 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById("adminPanel").classList.remove("hidden");
       document.getElementById("adminError").textContent="";
 
-      // 관리자 전환 후, 승인 리스트를 삭제버튼 포함으로 다시 그림
       const approvedSnap = await getDocs(approvedQ);
       renderApprovedSnapshot(approvedSnap);
 
-      // 승인 대기 실시간
       const pendingList=document.getElementById("pendingList");
       const pendingQ = query(collection(db,"sentences"), where("status","==","pending"));
       if(unsubscribePending) unsubscribePending();
@@ -472,14 +485,12 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
           pendingList.appendChild(item);
         });
-        // 이벤트 바인딩
         pendingList.querySelectorAll(".btnReject").forEach(b=>{
           b.addEventListener('click', async()=>{ await deleteDoc(doc(db,"sentences",b.dataset.id)); });
         });
         pendingList.querySelectorAll(".btnApprove").forEach(b=>{
           b.addEventListener('click', async()=>{
             await updateDoc(doc(db,"sentences",b.dataset.id),{status:"approved"});
-            // 승인되면 approved onSnapshot이 자동 갱신, 작성자 알림은 다음 접속 시 checkMyApproval로
           });
         });
       });
